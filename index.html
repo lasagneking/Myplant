@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyPlant — AI Plant Identification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🌿</span>
+        <h1>MyPlant</h1>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-tab="identify">Identify</button>
+        <button class="nav-btn" data-tab="search">Search Species</button>
+        <button class="nav-btn" data-tab="settings">Settings</button>
+      </nav>
+    </header>
+
+    <main class="main">
+      <!-- Identify Tab -->
+      <section id="identify" class="tab active">
+        <div class="hero">
+          <h2>Identify any plant from a photo</h2>
+          <p>Powered by Pl@ntNet AI • Upload 1–5 clear photos of the same plant</p>
+        </div>
+
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept="image/jpeg,image/png" multiple hidden />
+          <div class="upload-content">
+            <div class="upload-icon">📷</div>
+            <p><strong>Drag & drop</strong> or <button type="button" id="browseBtn" class="link-btn">browse</button></p>
+            <p class="hint">JPEG or PNG • Max 5 images • Best results with flower, leaf, fruit</p>
+          </div>
+        </div>
+
+        <div id="previewGrid" class="preview-grid hidden"></div>
+
+        <div class="options-row hidden" id="optionsRow">
+          <label>
+            Organ type
+            <select id="organSelect">
+              <option value="auto">Auto-detect</option>
+              <option value="flower">Flower</option>
+              <option value="leaf">Leaf</option>
+              <option value="fruit">Fruit</option>
+              <option value="bark">Bark</option>
+            </select>
+          </label>
+          <label>
+            Language
+            <select id="langSelect">
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="es">Español</option>
+              <option value="de">Deutsch</option>
+              <option value="it">Italiano</option>
+              <option value="pt">Português</option>
+            </select>
+          </label>
+          <label>
+            Project / Flora
+            <select id="projectSelect">
+              <option value="all">All (auto)</option>
+              <option value="k-world-flora">World Flora</option>
+              <option value="useful">Useful plants</option>
+              <option value="weeds">Weeds</option>
+              <option value="invasion">Invasive plants</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="actions hidden" id="actions">
+          <button id="identifyBtn" class="btn primary">
+            <span class="btn-text">Identify Plant</span>
+            <span class="spinner hidden"></span>
+          </button>
+          <button id="clearBtn" class="btn secondary">Clear</button>
+        </div>
+
+        <div id="results" class="results hidden"></div>
+      </section>
+
+      <!-- Search Tab -->
+      <section id="search" class="tab">
+        <div class="hero">
+          <h2>Search plant species</h2>
+          <p>Browse Pl@ntNet taxonomy and get detailed information</p>
+        </div>
+
+        <div class="search-box">
+          <input type="text" id="speciesSearch" placeholder="Scientific or common name (e.g. Acer campestre, rose...)" />
+          <button id="searchBtn" class="btn primary">Search</button>
+        </div>
+
+        <div id="searchResults" class="results"></div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section id="settings" class="tab">
+        <div class="hero">
+          <h2>Settings</h2>
+          <p>Configure your Pl@ntNet API access</p>
+        </div>
+
+        <div class="settings-card">
+          <h3>Pl@ntNet API Key</h3>
+          <p class="hint">
+            Get a free API key at
+            <a href="https://my.plantnet.org/" target="_blank" rel="noopener">my.plantnet.org</a>
+            (500 free identifications/day).
+          </p>
+          <div class="api-key-row">
+            <input type="password" id="apiKeyInput" placeholder="Paste your private API key here" />
+            <button id="saveKeyBtn" class="btn primary">Save</button>
+            <button id="toggleKeyBtn" class="btn secondary">Show</button>
+          </div>
+          <p id="keyStatus" class="status"></p>
+
+          <div class="info-box">
+            <h4>How to use your key in the browser</h4>
+            <ol>
+              <li>Create an account and generate an API key on <a href="https://my.plantnet.org/settings/api-key" target="_blank">my.plantnet.org</a></li>
+              <li>In the API key settings, check <strong>“Expose my API key”</strong></li>
+              <li>Add your domain (or <code>http://localhost:xxxx</code> for local testing) under Authorized domains</li>
+              <li>Paste the key above and click Save</li>
+            </ol>
+            <p class="note">Your key is stored only in your browser’s localStorage and never sent anywhere except to Pl@ntNet.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        MyPlant • Powered by
+        <a href="https://plantnet.org/" target="_blank" rel="noopener">Pl@ntNet</a>
+        recognition API •
+        Data enriched with
+        <a href="https://www.gbif.org/" target="_blank" rel="noopener">GBIF</a>
+      </p>
+    </footer>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
