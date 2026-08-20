@@ -163,14 +163,18 @@ $('#identifyBtn').addEventListener('click', async () => {
 
   try {
     const formData = new FormData();
-    const organ = $('#organSelect').value;
+    const organ = $('#organSelect').value || 'auto';
     selectedFiles.forEach((file) => {
       formData.append('images', file);
       formData.append('organs', organ);
     });
 
-    const project = $('#projectSelect').value;
-    const lang = $('#langSelect').value;
+    let project = $('#projectSelect').value;
+    if (!project || project === 'All (auto)') {
+      project = 'all';
+    }
+
+    const lang = $('#langSelect').value || 'en';
     const params = new URLSearchParams({
       'api-key': state.apiKey,
       lang,
@@ -179,7 +183,7 @@ $('#identifyBtn').addEventListener('click', async () => {
     });
 
     const res = await fetch(
-      `${API_BASE}/identify/${project}?${params}`,
+      `${API_BASE}/identify/${project}?${params.toString()}`,
       { method: 'POST', body: formData }
     );
 
@@ -302,7 +306,6 @@ async function doSpeciesSearch() {
   container.innerHTML = `<div class="empty-state">Searching…</div>`;
 
   try {
-    // Use species list with prefix
     const params = new URLSearchParams({
       'api-key': state.apiKey,
       prefix: q,
@@ -311,7 +314,7 @@ async function doSpeciesSearch() {
       lang: 'en',
     });
 
-    const res = await fetch(`${API_BASE}/projects/k-world-flora/species?${params}`);
+    const res = await fetch(`${API_BASE}/projects/k-world-flora/species?${params.toString()}`);
     if (!res.ok) {
       if (res.status === 401 || res.status === 403) {
         throw new Error('Invalid or unauthorized API key.');
@@ -321,7 +324,6 @@ async function doSpeciesSearch() {
 
     const list = await res.json();
     if (!Array.isArray(list) || !list.length) {
-      // Fallback: try align
       await tryAlign(q, container);
       return;
     }
@@ -341,7 +343,7 @@ async function tryAlign(name, container) {
       synonyms: 'true',
     });
     const res = await fetch(
-      `${API_BASE}/projects/k-world-flora/species/align?${params}`
+      `${API_BASE}/projects/k-world-flora/species/align?${params.toString()}`
     );
     if (!res.ok) throw new Error('No match found');
     const data = await res.json();
@@ -436,7 +438,6 @@ async function openDetailModal(result) {
     </div>
   `;
 
-  // Related images from PlantNet if available
   if (result.images && result.images.length) {
     body += `<div class="gbif-section"><h4>Similar observations (Pl@ntNet)</h4><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">`;
     result.images.slice(0, 6).forEach((img) => {
@@ -456,7 +457,6 @@ async function openDetailModal(result) {
   if (gbifId) {
     enrichWithGBIF(gbifId);
   } else if (sp.scientificNameWithoutAuthor) {
-    // Try to resolve via GBIF match
     try {
       const matchRes = await fetch(
         `${GBIF_BASE}/species/match?name=${encodeURIComponent(sp.scientificNameWithoutAuthor)}`
@@ -525,7 +525,6 @@ async function enrichWithGBIF(key) {
         ${species.rank ? ` • Rank: ${escapeHtml(species.rank)}` : ''}</p>`;
     }
 
-    // Vernacular names
     const names = (vern.results || [])
       .filter((v) => v.vernacularName)
       .slice(0, 12);
@@ -545,7 +544,6 @@ async function enrichWithGBIF(key) {
       html += `</ul>`;
     }
 
-    // Media
     const images = (media.results || []).filter((m) => m.identifier || m.references);
     if (images.length) {
       html += `<h4 style="margin-top:16px">Images (GBIF)</h4>
