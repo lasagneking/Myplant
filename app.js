@@ -2,7 +2,7 @@
 const STORAGE_KEY = "intolearn_personal_v1";
 const PRODUCT_CACHE_KEY = "intolearn_product_cache_v1";
 const PRODUCT_CACHE_SCHEMA = 3;
-const APP_VERSION = "9.7";
+const APP_VERSION = "9.8";
 
 // Hand-sketched, single-stroke "field notebook" icon set — every icon uses
 // currentColor so it inherits ink/amber automatically on selected/active
@@ -2782,15 +2782,41 @@ function renderMonth(){
   if(calendar){
     try{
       const dates=monthDates();
-      calendar.innerHTML=dates.map(d=>{
-        if(!d) return `<div></div>`;
-        const key=dateKey(d);
-        const day=state.days?.[key];
-        return `<button type="button" class="cal-day ${dayTone(day)}" data-key="${key}"><strong>${d.getDate()}</strong><span>${day? "•":""}</span></button>`;
-      }).join("");
-      calendar.querySelectorAll(".cal-day[data-key]").forEach(btn=>{
-        btn.addEventListener("click", ()=>openDayDetail(btn.dataset.key));
-      });
+      const existing=calendar.querySelectorAll(".cal-day[data-key]");
+      // In-place tone update when the grid already matches this month — enables colour morph
+      if(existing.length && existing.length === dates.filter(Boolean).length){
+        let i=0;
+        dates.forEach(d=>{
+          if(!d) return;
+          const key=dateKey(d);
+          const day=state.days?.[key];
+          const tone=dayTone(day) || "";
+          const btn=existing[i++];
+          if(!btn || btn.dataset.key!==key) return;
+          const prev=btn.className;
+          const next=`cal-day ${tone}`.trim();
+          if(prev!==next){
+            btn.className=next;
+            btn.querySelector("span").textContent=day? "•":"";
+            if(tone && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+              btn.classList.remove("tone-morph");
+              void btn.offsetWidth;
+              btn.classList.add("tone-morph");
+              setTimeout(()=>btn.classList.remove("tone-morph"), 600);
+            }
+          }
+        });
+      }else{
+        calendar.innerHTML=dates.map(d=>{
+          if(!d) return `<div></div>`;
+          const key=dateKey(d);
+          const day=state.days?.[key];
+          return `<button type="button" class="cal-day ${dayTone(day)}" data-key="${key}"><strong>${d.getDate()}</strong><span>${day? "•":""}</span></button>`;
+        }).join("");
+        calendar.querySelectorAll(".cal-day[data-key]").forEach(btn=>{
+          btn.addEventListener("click", ()=>openDayDetail(btn.dataset.key));
+        });
+      }
     }catch(err){
       console.error("Month calendar render failed",err);
       calendar.innerHTML=`<div class="muted" style="grid-column:1/-1;padding:12px">Calendar could not be rendered.</div>`;
@@ -3796,6 +3822,79 @@ function renderAll(){
     catch(err){ console.error(fn.name+" failed",err); }
   });
 }
+// --- Pull-to-refresh on Today view ---
+(function setupPullToRefresh(){
+  const view=document.getElementById("todayView");
+  if(!view) return;
+  let indicator=document.getElementById("pullRefreshIndicator");
+  if(!indicator){
+    indicator=document.createElement("div");
+    indicator.id="pullRefreshIndicator";
+    indicator.className="pull-refresh-indicator";
+    indicator.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/></svg>`;
+    view.prepend(indicator);
+  }
+  let startY=0, pulling=false, armed=false, refreshing=false;
+  const THRESHOLD=72;
+
+  function onStart(e){
+    if(refreshing) return;
+    if(window.scrollY>8) return;
+    if(!view.classList.contains("active")) return;
+    const t=e.touches?.[0];
+    if(!t) return;
+    startY=t.clientY;
+    pulling=true;
+    armed=false;
+  }
+  function onMove(e){
+    if(!pulling || refreshing) return;
+    const t=e.touches?.[0];
+    if(!t) return;
+    const dy=t.clientY-startY;
+    if(dy<8){
+      indicator.classList.remove("visible","ready");
+      indicator.style.transform="translate(-50%, -100%)";
+      return;
+    }
+    // Only when scrolled to top
+    if(window.scrollY>4) return;
+    const dist=Math.min(dy*0.45, 96);
+    indicator.classList.add("visible");
+    indicator.classList.toggle("ready", dist>=THRESHOLD*0.45);
+    indicator.style.transform=`translate(-50%, ${dist-40}px)`;
+    armed=dist>=THRESHOLD*0.45;
+    if(dy>12 && e.cancelable) e.preventDefault();
+  }
+  function onEnd(){
+    if(!pulling) return;
+    pulling=false;
+    if(armed && !refreshing){
+      refreshing=true;
+      indicator.classList.add("spinning","ready","visible");
+      indicator.style.transform="translate(-50%, 12px)";
+      haptic(8);
+      // Brief delay so the spinner is visible
+      setTimeout(()=>{
+        try{ renderAll(); }catch(err){ console.error(err); }
+        showToast("Updated", {success:true});
+        indicator.classList.remove("spinning","ready","visible");
+        indicator.style.transform="translate(-50%, -100%)";
+        refreshing=false;
+        armed=false;
+      }, 550);
+    }else{
+      indicator.classList.remove("visible","ready","spinning");
+      indicator.style.transform="translate(-50%, -100%)";
+      armed=false;
+    }
+  }
+  view.addEventListener("touchstart", onStart, {passive:true});
+  view.addEventListener("touchmove", onMove, {passive:false});
+  view.addEventListener("touchend", onEnd, {passive:true});
+  view.addEventListener("touchcancel", onEnd, {passive:true});
+})();
+
 applyAccentTheme(state.profile?.accentTheme || "amber");
 ensureDay(); renderAll();
 renderAvatar();

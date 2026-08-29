@@ -497,7 +497,10 @@ h3{margin:0;font-weight:600}
   color:#161310;
   border-color:transparent;
   font-weight:700;
-  box-shadow:0 2px 10px rgba(var(--trace-rgb),.35);
+  box-shadow:
+    0 2px 10px rgba(var(--trace-rgb),.35),
+    0 0 20px rgba(var(--trace-rgb),.25),
+    0 0 0 1px rgba(var(--trace-rgb),.2);
 }
 
 /* 4-option rows (Consistency / Urgency / Feeling): clean 2×2 grid so nothing is left stranded */
@@ -652,9 +655,16 @@ textarea:focus,input:focus,select:focus{
 .nav-item.active{
   border-top-color:var(--trace);
   color:var(--trace);
+  text-shadow:0 0 18px rgba(var(--trace-rgb),.35);
 }
-.nav-item span{font-size:19px;transition:transform .2s var(--ease)}
-.nav-item.active span{transform:translateY(-1px)}
+.nav-item span{font-size:19px;transition:transform .2s var(--ease), filter .25s ease}
+.nav-item.active span{
+  transform:translateY(-1px);
+  filter:drop-shadow(0 0 6px rgba(var(--trace-rgb),.45));
+}
+.nav-item.active small{
+  text-shadow:0 0 12px rgba(var(--trace-rgb),.3);
+}
 .nav-item small{
   font-size:9px;
   font-family:var(--font-mono);
@@ -744,7 +754,12 @@ textarea:focus,input:focus,select:focus{
   appearance:none;-webkit-appearance:none;
   margin:0;
   color:var(--ink);
-  transition:transform .2s var(--ease), box-shadow .25s ease, background .25s ease;
+  transition:
+    transform .2s var(--ease),
+    box-shadow .45s var(--ease-out),
+    background .45s var(--ease-out),
+    border-color .45s var(--ease-out),
+    color .45s var(--ease-out);
   box-shadow:var(--shadow-sm);
 }
 .cal-day:hover{transform:scale(1.05)}
@@ -765,6 +780,14 @@ textarea:focus,input:focus,select:focus{
   border-color:rgba(var(--flag-rgb),.4);
   box-shadow:var(--shadow-flag);
   color:var(--flag);
+}
+.cal-day.tone-morph{
+  animation:calToneMorph .55s var(--ease-out);
+}
+@keyframes calToneMorph{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.08)}
+  100%{transform:scale(1)}
 }
 
 .day-detail-section{margin-bottom:22px}
@@ -800,10 +823,16 @@ textarea:focus,input:focus,select:focus{
 .trend-bar>span{
   display:block;
   height:100%;
-  background:linear-gradient(90deg, var(--trace), #f0c060);
+  background:linear-gradient(90deg, var(--trace), #f0c060, var(--trace));
+  background-size:200% 100%;
   border-radius:var(--radius-full);
   transition:width .6s var(--ease-out);
   box-shadow:0 0 12px rgba(var(--trace-rgb),.4);
+  animation:barShimmer 3.5s ease-in-out infinite;
+}
+@keyframes barShimmer{
+  0%,100%{background-position:100% 0}
+  50%{background-position:0% 0}
 }
 .trend-meta{
   display:flex;justify-content:space-between;
@@ -1153,10 +1182,12 @@ dialog input,dialog textarea{margin-bottom:14px}
 }
 .connection-bar span{
   display:block;height:100%;
-  background:linear-gradient(90deg, var(--trace), #f0c060);
+  background:linear-gradient(90deg, var(--trace), #f0c060, var(--trace));
+  background-size:200% 100%;
   border-radius:var(--radius-full);
   transition:width .7s var(--ease-out);
   box-shadow:0 0 10px rgba(var(--trace-rgb),.35);
+  animation:barShimmer 3.5s ease-in-out infinite;
 }
 .connection-card p{margin:6px 0;color:var(--muted);font-size:13px;line-height:1.5;font-family:var(--font-body)}
 
@@ -1783,4 +1814,52 @@ dialog input,dialog textarea{margin-bottom:14px}
 #reportExposures .empty-state,
 #monthResults .empty-state{
   padding:32px 16px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .trend-bar>span,.connection-bar span{animation:none}
+  .cal-day.tone-morph{animation:none}
+  .pull-refresh-indicator{transition:none}
+}
+
+/* ========== PULL TO REFRESH (Today) ========== */
+.pull-refresh-indicator{
+  position:absolute;
+  left:50%;
+  top:0;
+  transform:translate(-50%, -100%);
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--surface);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-md);
+  color:var(--trace);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;
+  z-index:5;
+}
+.pull-refresh-indicator.visible{
+  opacity:1;
+}
+.pull-refresh-indicator.ready{
+  box-shadow:var(--shadow-md), 0 0 16px rgba(var(--trace-rgb),.35);
+  border-color:rgba(var(--trace-rgb),.4);
+}
+.pull-refresh-indicator svg{
+  width:20px;
+  height:20px;
+  transition:transform .2s ease;
+}
+.pull-refresh-indicator.spinning svg{
+  animation:pullSpin .7s linear infinite;
+}
+@keyframes pullSpin{
+  to{transform:rotate(360deg)}
+}
+#todayView{
+  position:relative;
 }
