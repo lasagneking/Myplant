@@ -1495,3 +1495,110 @@ dialog input,dialog textarea{margin-bottom:14px}
   border-radius:var(--radius);
   box-shadow:var(--shadow-sm);
 }
+
+/* ========== ELEVATED MICRO-INTERACTIONS ========== */
+
+/* Card press depth */
+.meal-card,
+.knowledge-tile,
+.checker-launch-card,
+.card.exit-card,
+.report-panel {
+  transition: transform var(--duration) var(--ease-out),
+              box-shadow var(--duration) ease,
+              border-color var(--duration) ease,
+              background var(--duration) ease;
+}
+.meal-card:active,
+.knowledge-tile:active,
+.checker-launch-card:active {
+  transform: scale(0.985);
+  box-shadow: var(--shadow-sm), inset 0 2px 8px rgba(0,0,0,.25);
+}
+
+/* Primary / action button press + haptic visual */
+.primary,
+.add-btn,
+.checker-launch-btn,
+.range-btn,
+.nav-item {
+  position: relative;
+  overflow: hidden;
+}
+.primary:active,
+.add-btn:active,
+.checker-launch-btn:active {
+  transform: scale(0.96);
+}
+
+/* Expanding success ring that originates from a button */
+.success-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(var(--trace-rgb), 0.45);
+  animation: successRing 0.55s var(--ease-out) forwards;
+}
+@keyframes successRing {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--trace-rgb), 0.5); opacity: 1; }
+  100% { box-shadow: 0 0 0 18px rgba(var(--trace-rgb), 0); opacity: 0; }
+}
+
+/* Soft amber pulse on the whole control after success */
+.btn-success-pulse {
+  animation: btnSuccessPulse 0.6s var(--ease-out);
+}
+@keyframes btnSuccessPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--trace-rgb), 0.5); }
+  40%  { box-shadow: 0 0 0 10px rgba(var(--trace-rgb), 0.15), 0 4px 20px rgba(var(--trace-rgb), 0.35); }
+  100% { box-shadow: 0 4px 14px rgba(var(--trace-rgb), 0.3); }
+}
+
+/* Streak celebration */
+.hero-streak {
+  transition: transform 0.35s var(--ease), box-shadow 0.35s ease, background 0.35s ease;
+}
+.hero-streak.celebrate {
+  animation: streakCelebrate 0.7s var(--ease-out);
+}
+@keyframes streakCelebrate {
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--trace-rgb), 0.4); }
+  35%  { transform: scale(1.12); box-shadow: 0 0 0 12px rgba(var(--trace-rgb), 0.15), 0 0 24px rgba(var(--trace-rgb), 0.35); background: rgba(var(--trace-rgb), 0.28); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+
+/* Toast gets a slightly richer entrance when it's a success */
+.toast.success-toast {
+  animation: toastSuccessIn 0.4s var(--ease-out);
+}
+@keyframes toastSuccessIn {
+  0%   { opacity: 0; transform: translate(-50%, 16px) scale(0.94); }
+  60%  { opacity: 1; transform: translate(-50%, -4px) scale(1.03); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+/* Mood orb gentle react when feeling is saved */
+.mood-orb.react {
+  animation: moodReact 0.55s var(--ease-out);
+}
+@keyframes moodReact {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .success-ring,
+  .btn-success-pulse,
+  .hero-streak.celebrate,
+  .toast.success-toast,
+  .mood-orb.react,
+  .meal-card:active,
+  .knowledge-tile:active,
+  .checker-launch-card:active {
+    animation: none !important;
+    transform: none !important;
+  }
+}

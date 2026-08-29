@@ -2,7 +2,7 @@
 const STORAGE_KEY = "intolearn_personal_v1";
 const PRODUCT_CACHE_KEY = "intolearn_product_cache_v1";
 const PRODUCT_CACHE_SCHEMA = 3;
-const APP_VERSION = "9.3";
+const APP_VERSION = "9.4";
 
 // Hand-sketched, single-stroke "field notebook" icon set — every icon uses
 // currentColor so it inherits ink/amber automatically on selected/active
@@ -1080,13 +1080,42 @@ function escapeHtml(s=""){
   return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 }
 function titleCase(s){return s.replace(/\b\w/g,c=>c.toUpperCase())}
-function showToast(message){
+function haptic(ms=8){
+  try{
+    if(navigator.vibrate && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      navigator.vibrate(ms);
+    }
+  }catch(_){}
+}
+
+function triggerSuccessPulse(el){
+  if(!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  el.classList.remove("btn-success-pulse");
+  // Force reflow so the animation can re-trigger
+  void el.offsetWidth;
+  el.classList.add("btn-success-pulse");
+  // Expanding ring overlay
+  const ring=document.createElement("span");
+  ring.className="success-ring";
+  el.style.position = el.style.position || "relative";
+  el.appendChild(ring);
+  setTimeout(()=>ring.remove(), 600);
+  setTimeout(()=>el.classList.remove("btn-success-pulse"), 650);
+}
+
+function showToast(message, {success=false}={}){
   const toast=document.getElementById("toast");
   toast.textContent=message;
+  toast.classList.toggle("success-toast", !!success);
   toast.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>toast.classList.remove("show"),1800);
+  toastTimer=setTimeout(()=>{
+    toast.classList.remove("show");
+    toast.classList.remove("success-toast");
+  }, success ? 2000 : 1800);
 }
+
+let lastKnownStreak = 0;
 
 document.body.dataset.intolearnVersion = APP_VERSION;
 document.getElementById("todayDate").textContent = fmtDate(new Date());
@@ -1426,9 +1455,11 @@ function saveMeal(){
   try {
     renderAll();
   } finally {
-    showToast(contamination
+    haptic(8);
+    const msg = contamination
       ? `Heads up — this contains "${contamination}", which you're currently eliminating.`
-      : (isNew ? "Entry saved" : "Changes saved"));
+      : (isNew ? "Entry saved" : "Changes saved");
+    showToast(msg, {success: !contamination});
   }
 }
 
@@ -1781,9 +1812,10 @@ function saveSupplement(){
 
   closeSupplementDialog();
   renderAll();
+  haptic(8);
   showToast(course
     ? `Entry saved — ${course.durationDays ? course.durationDays+"-day course" : "daily"} logging started`
-    : (isNew ? "Entry saved" : "Changes saved"));
+    : (isNew ? "Entry saved" : "Changes saved"), {success:true});
 
   // Prescription/OTC lookups hit the network, so they run silently in the
   // background after the save/close — never blocking the dialog on a slow
@@ -2097,6 +2129,8 @@ function applyDefaultCheckerTriggers(){
   });
 }
 document.getElementById("openCheckerBtn").addEventListener("click",()=>{
+  haptic(6);
+  triggerSuccessPulse(document.getElementById("openCheckerBtn"));
   resetCheckerResult();
   document.getElementById("checkerCamera").value="";
   document.getElementById("checkerLibrary").value="";
@@ -2117,6 +2151,8 @@ function closeTrialDialog(){
   if(dialog.hasAttribute("open")) dialog.removeAttribute("open");
 }
 document.getElementById("openTrialDialogBtn").addEventListener("click", ()=>{
+  haptic(6);
+  triggerSuccessPulse(document.getElementById("openTrialDialogBtn"));
   document.getElementById("trialIngredient").value="";
   document.getElementById("trialIngredient").classList.remove("field-error");
   document.getElementById("trialEliminationDays").value="14";
@@ -2149,9 +2185,10 @@ document.getElementById("startTrialBtn").addEventListener("click", ()=>{
   });
 
   if(saveState()){
+    haptic(10);
     closeTrialDialog();
     renderAll();
-    showToast(`Trial started — eliminating ${ingredient} for ${eliminationDays} days`);
+    showToast(`Trial started — eliminating ${ingredient} for ${eliminationDays} days`, {success:true});
   }else{
     state.trials.pop();
   }
@@ -2219,8 +2256,19 @@ document.getElementById("saveExitBtn").onclick=()=>{
     updatedAt:new Date().toISOString()
   };
   if(saveState()){
+    const btn=document.getElementById("saveExitBtn");
+    haptic(10);
+    triggerSuccessPulse(btn);
     renderAll();
-    showToast("Exit Interview saved");
+    // Mood orb reacts
+    const orb=document.getElementById("summaryMood");
+    if(orb){
+      orb.classList.remove("react");
+      void orb.offsetWidth;
+      orb.classList.add("react");
+      setTimeout(()=>orb.classList.remove("react"), 600);
+    }
+    showToast("Exit Interview saved", {success:true});
   }
 };
 
@@ -3365,11 +3413,13 @@ document.getElementById("onboardingSaveBtn").addEventListener("click", ()=>{
     onboarded: true
   };
   saveState();
+  haptic(10);
+  triggerSuccessPulse(document.getElementById("onboardingSaveBtn"));
   renderAvatar();
   renderGreeting();
   renderKnowledgeGrid();
   closeOnboardingDialog();
-  showToast("Profile saved");
+  showToast("Profile saved", {success:true});
 });
 document.getElementById("closeOnboardingBtn").addEventListener("click", cancelOnboardingDialog);
 document.getElementById("onboardingDialog").addEventListener("cancel", e=>{
@@ -3663,7 +3713,17 @@ function renderLoggingStreak(){
   const el=document.getElementById("loggingStreak");
   if(!el) return;
   const streak=computeLoggingStreak();
+  const prev = lastKnownStreak;
   el.textContent = streak>=1 ? `${streak}-day logging streak` : "";
+  // Celebrate only when the streak actually increases (not on first paint)
+  if(streak > prev && prev > 0 && streak >= 1){
+    el.classList.remove("celebrate");
+    void el.offsetWidth;
+    el.classList.add("celebrate");
+    haptic(12);
+    setTimeout(()=>el.classList.remove("celebrate"), 750);
+  }
+  lastKnownStreak = streak;
 }
 
 function renderAll(){
