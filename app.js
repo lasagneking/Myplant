@@ -2,7 +2,7 @@
 const STORAGE_KEY = "intolearn_personal_v1";
 const PRODUCT_CACHE_KEY = "intolearn_product_cache_v1";
 const PRODUCT_CACHE_SCHEMA = 3;
-const APP_VERSION = "9.5";
+const APP_VERSION = "9.7";
 
 // Hand-sketched, single-stroke "field notebook" icon set — every icon uses
 // currentColor so it inherits ink/amber automatically on selected/active
@@ -33,8 +33,22 @@ const ICONS={
   clipboard:`<svg viewBox="0 0 24 24" ${SVG_BASE}><rect x="5.5" y="4.5" width="13" height="16" rx="0.5"/><rect x="9" y="3" width="6" height="3" rx="0.5"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></svg>`,
   tally:`<svg viewBox="0 0 24 24" ${SVG_BASE}><path d="M5 6.5h11M5 12h14M5 17.5h8"/></svg>`,
   gear:`<svg viewBox="0 0 24 24" ${SVG_BASE}><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M17.7 6.3l-1.6 1.6M7.9 16.1l-1.6 1.6M17.7 17.7l-1.6-1.6M7.9 7.9 6.3 6.3"/></svg>`,
-  trial:`<svg viewBox="0 0 24 24" ${SVG_BASE}><circle cx="11" cy="12" r="7.5"/><path d="M6 6.5l10 11"/><circle cx="19" cy="4.5" r="1.1" fill="var(--trace)" stroke="none"/></svg>`
+  trial:`<svg viewBox="0 0 24 24" ${SVG_BASE}><circle cx="11" cy="12" r="7.5"/><path d="M6 6.5l10 11"/><circle cx="19" cy="4.5" r="1.1" fill="var(--trace)" stroke="none"/></svg>`,
+  // Empty-state illustrations — larger single-stroke drawings for calm empty panels
+  emptyPlate:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="34" r="14"/><circle cx="32" cy="34" r="7" opacity=".45"/><path d="M12 28c0-6 3-11 7-13M52 28c0-6-3-11-7-13"/><path d="M14 48h36" opacity=".35"/></svg>`,
+  emptyCalendar:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="16" width="36" height="34" rx="2"/><path d="M14 26h36M24 12v8M40 12v8"/><circle cx="26" cy="36" r="1.6" fill="currentColor" stroke="none"/><circle cx="32" cy="36" r="1.6" fill="currentColor" stroke="none"/><circle cx="38" cy="36" r="1.6" fill="currentColor" stroke="none"/><circle cx="26" cy="44" r="1.6" fill="currentColor" stroke="none"/><path d="M44 42c2.5 1.2 4 3.5 4 6.2 0 2.2-1.2 3.8-3 3.8-2.5 0-4-3.2-4-6.5 0-1.4.4-2.8 1.2-3.8" opacity=".7"/><circle cx="48" cy="40" r="1.2" fill="var(--trace)" stroke="none"/></svg>`,
+  emptyChart:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 48V18M12 48h40"/><path d="M20 42v-8M28 42V28M36 42V34"/><path d="M18 36c6-2 10-10 14-12 4-2 8 2 12 0 3-1.5 6-4 8-6"/><circle cx="52" cy="16" r="2.2" fill="var(--trace)" stroke="none"/></svg>`,
+  emptyPill:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="26" width="28" height="14" rx="7" transform="rotate(-32 32 33)"/><path d="M26 38.5 38 27.5" stroke-width="1.5"/><circle cx="46" cy="18" r="1.4" fill="var(--trace)" stroke="none"/></svg>`,
+  emptySearch:`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="28" cy="28" r="12"/><path d="M37 37l12 12"/><path d="M22 28c0-3.5 2.5-6 6-6" opacity=".5"/><circle cx="48" cy="16" r="1.4" fill="var(--trace)" stroke="none"/></svg>`
 };
+
+function emptyState(iconSvg, title, subtitle){
+  return `<div class="empty-state">
+    <div class="empty-state-icon">${iconSvg}</div>
+    <strong class="empty-state-title">${title}</strong>
+    <p class="empty-state-copy">${subtitle}</p>
+  </div>`;
+}
 
 // Icons for the 22-item allergen/trigger grid shared by Ingredient Checker
 // and onboarding. Keyed by the exact data-trigger value so one map covers
@@ -1138,7 +1152,7 @@ function renderMeals(){
         </div>
       </div>
       <div class="entry-list collapsible-content">
-        ${items.map((it,i)=>{
+        ${items.length ? items.map((it,i)=>{
           if(it.barcode){
             return `
               <button class="barcode-diary-entry view-entry" type="button" data-meal="${m.key}" data-index="${i}" aria-label="Open ${escapeHtml(it.name)}">
@@ -1166,7 +1180,7 @@ function renderMeals(){
                 <button class="entry-action delete delete-entry" type="button" data-meal="${m.key}" data-index="${i}">Delete</button>
               </div>
             </div>`;
-        }).join("")}
+        }).join("") : emptyState(ICONS.emptyPlate, "Nothing logged yet", "Tap + Add to start today's notes.")}
       </div>`;
     wrap.appendChild(card);
   });
@@ -1676,7 +1690,7 @@ function renderSupplements(){
   document.getElementById("supplementSummary").textContent=
     items.length ? `${items.length} entr${items.length===1?"y":"ies"}` : "Nothing logged yet";
 
-  document.getElementById("supplementList").innerHTML=items.map((it,i)=>`
+  document.getElementById("supplementList").innerHTML=items.length ? items.map((it,i)=>`
     <div class="food-entry">
       <div class="food-entry-main">
         <strong>${escapeHtml(it.name)}</strong>
@@ -1688,7 +1702,7 @@ function renderSupplements(){
         <button type="button" class="entry-action delete delete-supplement" data-index="${i}">Delete</button>
       </div>
     </div>
-  `).join("");
+  `).join("") : emptyState(ICONS.emptyPill, "Nothing logged yet", "Vitamins, supplements and meds can matter too.");
 
   document.querySelectorAll(".edit-supplement").forEach(btn=>{
     btn.addEventListener("click", ()=>openSupplement(Number(btn.dataset.index), dateKey()));
@@ -2934,7 +2948,7 @@ function renderMonthResults(){
           <small>${new Date(o.k+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"})} · ${mealTypes.find(m=>m.key===o.m)?.label||""}</small>
           <span class="result-chevron">›</span>
         </button>`).join("")
-      : `<p class="muted">No matching entries.</p>`;
+      : emptyState(ICONS.emptySearch, "No days match yet", "Try a different food, ingredient or symptom — or clear the filter.");
 
     resultsBox.querySelectorAll(".month-result-link").forEach(btn=>{
       btn.addEventListener("click",()=>{
@@ -3102,11 +3116,17 @@ function renderReport(){
       <div class="connection-title"><strong>${knowledgeLink(titleCase(x.name))}</strong><span class="connection-score">${Math.round(x.rate*100)}%</span></div>
       <div class="connection-bar"><span style="width:${Math.round(x.rate*100)}%"></span></div>
       <p>${x.symptomDays} of ${x.days} exposure day${x.days===1?"":"s"} were followed by symptoms within ${reactionWindowLabel(reactionWindowDays)} — vs ${Math.round(baseline*100)}% of all recorded days.</p>
-    </div>`).join(""):`<p class="muted">${consideredDays<3?"Not enough recorded days yet.":"No ingredient stands out clearly from your usual baseline yet."} Keep logging and this section will build automatically.</p>`;
+    </div>`).join(""):emptyState(
+      ICONS.emptyChart,
+      consideredDays<3 ? "Not enough data yet" : "Nothing stands out yet",
+      consideredDays<3
+        ? "About a week of logging is usually enough for the first insights to appear."
+        : "No ingredient stands out clearly from your usual baseline. Keep logging and this section will build automatically."
+    );
 
   const exposures=Object.entries(statsRaw).map(([name,v])=>({name,...v})).sort((a,b)=>b.days-a.days).slice(0,8);
   document.getElementById("reportExposures").innerHTML=exposures.length?exposures.map(x=>`
-    <div class="exposure-row"><strong>${knowledgeLink(titleCase(x.name))}</strong><span>${x.days} day${x.days===1?"":"s"}</span></div>`).join(""):`<p class="muted">No ingredient groups recorded in this period yet.</p>`;
+    <div class="exposure-row"><strong>${knowledgeLink(titleCase(x.name))}</strong><span>${x.days} day${x.days===1?"":"s"}</span></div>`).join(""):emptyState(ICONS.emptyPlate, "No ingredient groups yet", "Log a few meals in this period and groups will show up here.");
 
   document.getElementById("reportExit").innerHTML=`
     <div class="exit-grid">
@@ -3462,10 +3482,20 @@ document.getElementById("onboardingDialog").addEventListener("cancel", e=>{
 
 document.querySelectorAll(".nav-item").forEach(btn=>{
   btn.onclick=()=>{
+    const targetId = btn.dataset.view;
+    const target = document.getElementById(targetId);
+    if(!target) return;
+    // Skip if already on this view — avoids replaying the cross-fade
+    if(target.classList.contains("active") && btn.classList.contains("active")){
+      renderAll();
+      return;
+    }
     document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-    document.getElementById(btn.dataset.view).classList.add("active");
+    // Force reflow so the entrance animation always restarts
+    void target.offsetWidth;
+    target.classList.add("active");
     renderAll();
   };
 });

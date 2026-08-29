@@ -1719,3 +1719,68 @@ dialog input,dialog textarea{margin-bottom:14px}
     transform: none !important;
   }
 }
+
+/* ========== EMPTY STATES ========== */
+.empty-state{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:28px 18px 24px;
+  gap:8px;
+  background:transparent;
+  border-radius:var(--radius-sm);
+}
+.empty-state-icon{
+  width:64px;
+  height:64px;
+  color:var(--muted);
+  opacity:.7;
+  margin-bottom:6px;
+  display:grid;
+  place-items:center;
+}
+.empty-state-icon svg{
+  width:64px;
+  height:64px;
+  display:block;
+}
+.empty-state-title{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:16px;
+  color:var(--ink);
+  letter-spacing:-.01em;
+}
+.empty-state-copy{
+  margin:0;
+  max-width:260px;
+  font-size:13px;
+  line-height:1.45;
+  color:var(--muted);
+  font-family:var(--font-body);
+}
+
+/* Empty state inside meal/supplement lists — slightly tighter */
+.entry-list > .empty-state,
+#supplementList > .empty-state{
+  padding:22px 14px 18px;
+  background:rgba(0,0,0,.12);
+  border-radius:var(--radius-sm);
+}
+.entry-list > .empty-state .empty-state-icon,
+#supplementList > .empty-state .empty-state-icon{
+  width:52px;height:52px;opacity:.65;
+}
+.entry-list > .empty-state .empty-state-icon svg,
+#supplementList > .empty-state .empty-state-icon svg{
+  width:52px;height:52px;
+}
+
+/* Report / month empty panels */
+#reportConnections .empty-state,
+#reportExposures .empty-state,
+#monthResults .empty-state{
+  padding:32px 16px;
+}
