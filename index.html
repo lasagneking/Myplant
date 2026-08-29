@@ -2,162 +2,810 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MyPlant — AI Plant Identification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f0e0d" />
+  <title>Intolearn</title>
+  <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Petit+Formal+Script&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" />
+  <link rel="stylesheet" href="styles.css?v=90" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Intolearn">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
 <body>
-  <div id="app">
-    <!-- Header -->
-    <header class="header">
-      <div class="logo">
-        <span class="logo-icon">🌿</span>
-        <h1>MyPlant</h1>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-bg" aria-hidden="true">
+        <svg class="tb-icon tb-icon-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V4"/><path d="M12 6l-2.4-1.4M12 6l2.4-1.4M12 9.2l-2.4-1.4M12 9.2l2.4-1.4M12 12.4l-2.4-1.4M12 12.4l2.4-1.4M12 15.6l-2.4-1.4M12 15.6l2.4-1.4"/></svg>
+        <svg class="tb-icon tb-icon-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 3v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V7Z"/><path d="M8.5 10.5h7"/></svg>
+        <svg class="tb-icon tb-icon-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8c-3.2 3.2-5.3 8-5.3 11.3a5.3 5.3 0 1 0 10.6 0c0-3.3-2.1-8.1-5.3-11.3Z"/></svg>
+        <svg class="tb-icon tb-icon-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.3 4.8a2.8 2.8 0 0 0-2.8 2.8c0 .9.4 1.5.9 2-1 .7-1.5 1.7-1.5 3.1a3.1 3.1 0 0 0 3.1 3.1c.9 0 1.6-.3 2.1-.8.5.5 1.2.8 2.1.8a3.1 3.1 0 0 0 3.1-3.1c0-1.4-.5-2.4-1.5-3.1.5-.5.9-1.1.9-2a2.8 2.8 0 0 0-2.8-2.8c-.9 0-1.6.4-2.1.9-.5-.5-1.2-.9-2.1-.9Z"/></svg>
+        <svg class="tb-icon tb-icon-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5.3c.9 0 1.7.4 2 1.2M9.2 6.7c-2.4 1-3.9 3.8-3.9 6.6a4.7 4.7 0 0 0 4.7 4.7c3.7 0 7.5-3.8 7.5-8.5 0-1.9-.9-3.3-2.3-3.8"/></svg>
       </div>
-      <nav class="nav">
-        <button class="nav-btn active" data-tab="identify">Identify</button>
-        <button class="nav-btn" data-tab="search">Search Species</button>
-        <button class="nav-btn" data-tab="settings">Settings</button>
-      </nav>
+      <div class="topbar-content">
+        <div class="brand">Intolearn</div>
+        <div class="byline" id="greetingLine">Field notes for what you eat</div>
+      </div>
+      <button class="icon-button avatar-button" id="settingsBtn" aria-label="Settings"></button>
     </header>
 
-    <main class="main">
-      <!-- Identify Tab -->
-      <section id="identify" class="tab active">
-        <div class="hero">
-          <h2>Identify any plant from a photo</h2>
-          <p>Powered by Pl@ntNet AI • Upload 1–5 clear photos of the same plant</p>
+    <main>
+      <section id="todayView" class="view active">
+        <div class="hero-card">
+          <div>
+            <div class="eyebrow" id="todayEyebrow">TODAY</div>
+            <h1 id="todayDate">Today</h1>
+            <p>Small entries, clearer patterns.</p>
+            <p class="hero-streak" id="loggingStreak"></p>
+          </div>
+          <div class="mood-orb" id="summaryMood">🙂</div>
         </div>
 
-        <div class="upload-zone" id="uploadZone">
-          <input type="file" id="fileInput" accept="image/jpeg,image/png" multiple hidden />
-          <div class="upload-content">
-            <div class="upload-icon">📷</div>
-            <p><strong>Drag & drop</strong> or <button type="button" id="browseBtn" class="link-btn">browse</button></p>
-            <p class="hint">JPEG or PNG • Max 5 images • Best results with flower, leaf, fruit</p>
+        <div class="checker-warning hidden" id="activeFlagBanner">
+          <strong>Worth keeping in mind today</strong>
+          <div id="activeFlagBody"></div>
+        </div>
+
+        <section class="checker-launch-card">
+          <div class="checker-launch-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/><path d="M7.8 10.5c0-1.6 1.2-2.7 2.7-2.7" stroke-width="1.3"/><circle cx="19" cy="4.5" r="1.1" fill="var(--trace)" stroke="none"/></svg></div>
+          <div class="checker-launch-copy">
+            <div class="eyebrow">INGREDIENT CHECKER</div>
+            <h3>Check a product before you eat it</h3>
+            <p>Select ingredients you need to watch, then scan and crop the label.</p>
+          </div>
+          <button type="button" class="primary checker-launch-btn" id="openCheckerBtn">Check food</button>
+        </section>
+
+        <section class="checker-launch-card" id="trialLaunchCard">
+          <div class="checker-launch-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="7.5"/><path d="M6 6.5l10 11"/><circle cx="19" cy="4.5" r="1.1" fill="var(--trace)" stroke="none"/></svg></div>
+          <div class="checker-launch-copy">
+            <div class="eyebrow">ELIMINATION TRIAL</div>
+            <h3>Test a suspect ingredient</h3>
+            <p>Remove it for a set period, then reintroduce it deliberately and watch closely.</p>
+          </div>
+          <button type="button" class="primary checker-launch-btn" id="openTrialDialogBtn">Start a trial</button>
+        </section>
+
+        <div class="checker-warning hidden" id="activeTrialBanner">
+          <strong id="activeTrialTitle">Trial in progress</strong>
+          <p id="activeTrialText"></p>
+          <button type="button" class="danger wide" id="stopTrialBtn" style="margin-top:10px">Stop trial</button>
+        </div>
+
+        <div class="section-title-row">
+          <div>
+            <h2>Food diary</h2>
+            <p>Tap any meal to add food or scan ingredients.</p>
           </div>
         </div>
 
-        <div id="previewGrid" class="preview-grid hidden"></div>
+        <div id="mealSections" class="meal-grid"></div>
 
-        <div class="options-row hidden" id="optionsRow">
-          <label>
-            Organ type
-            <select id="organSelect">
-              <option value="auto">Auto-detect</option>
-              <option value="flower">Flower</option>
-              <option value="leaf">Leaf</option>
-              <option value="fruit">Fruit</option>
-              <option value="bark">Bark</option>
-            </select>
-          </label>
-          <label>
-            Language
-            <select id="langSelect">
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="es">Español</option>
-              <option value="de">Deutsch</option>
-              <option value="it">Italiano</option>
-              <option value="pt">Português</option>
-            </select>
-          </label>
-          <label>
-            Project / Flora
-            <select id="projectSelect">
-              <option value="all">All (auto)</option>
-              <option value="k-world-flora">World Flora</option>
-              <option value="useful">Useful plants</option>
-              <option value="weeds">Weeds</option>
-              <option value="invasion">Invasive plants</option>
-            </select>
-          </label>
+        <div class="section-title-row">
+          <div>
+            <h2>Supplements & meds</h2>
+            <p>Vitamins, supplements and prescriptions can cause GI symptoms too.</p>
+          </div>
         </div>
+        <section class="card meal-card" id="supplementCard" data-collapse-key="supplements">
+          <div class="meal-head collapse-toggle">
+            <div><span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9.8" width="17" height="7.4" rx="3.7" transform="rotate(-35 12 12)"/><path d="M12 12 8.8 15.2" stroke-width="1.6"/></svg></span><div><h3>Supplements & meds</h3><p id="supplementSummary">Nothing logged yet</p></div></div>
+            <div class="meal-head-right">
+              <span class="collapse-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+              <button class="add-btn" id="addSupplementBtn" type="button">+ Add</button>
+            </div>
+          </div>
+          <div class="collapsible-content">
+            <div id="courseList"></div>
+            <div id="supplementList" class="entry-list"></div>
+          </div>
+        </section>
 
-        <div class="actions hidden" id="actions">
-          <button id="identifyBtn" class="btn primary">
-            <span class="btn-text">Identify Plant</span>
-            <span class="spinner hidden"></span>
-          </button>
-          <button id="clearBtn" class="btn secondary">Clear</button>
+        <section class="card exit-card">
+          <div class="card-head">
+            <div>
+              <span class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="0.5"/><circle cx="14.3" cy="12.2" r="0.9" fill="currentColor" stroke="none"/><circle cx="19" cy="4.5" r="1.2" fill="var(--trace)" stroke="none"/></svg></span>
+              <div>
+                <h3>Exit Interview</h3>
+                <p>Quick daily check-in</p>
+              </div>
+            </div>
+            <span class="pill" id="exitStatus">Not completed</span>
+          </div>
+
+          <div class="field-block">
+            <label>Visits today</label>
+            <div class="choice-row" data-choice="frequency">
+              <button>0</button><button>1</button><button>2</button><button>3</button><button>4</button><button>5+</button>
+            </div>
+          </div>
+
+          <div class="field-block">
+            <label>Consistency</label>
+            <div class="choice-row emoji-row" data-choice="consistency">
+              <button data-value="Very loose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c3 4 6 7.6 6 11a6 6 0 1 1-12 0c0-3.4 3-7 6-11Z"/></svg><span>Very loose</span></button>
+              <button data-value="Loose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12c0-3.5 3-6.5 7.5-6.5s7.5 3 7.5 6.5-3 6.5-7.5 6.5S4.5 15.5 4.5 12Z"/><path d="M8 12c1-1.4 2-1.4 3 0s2 1.4 3 0 2-1.4 3 0" stroke-width="1.4"/></svg><span>Loose</span></button>
+              <button data-value="Normal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5.5"/></svg><span>Normal</span></button>
+              <button data-value="Firm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8.5" width="9" height="5" rx="0.5"/><rect x="10.5" y="14" width="9" height="5" rx="0.5"/></svg><span>Firm</span></button>
+            </div>
+          </div>
+
+          <div class="field-block">
+            <label>Urgency</label>
+            <div class="choice-row emoji-row" data-choice="urgency">
+              <button data-value="None"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12h17"/></svg><span>None</span></button>
+              <button data-value="Mild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12h5l2-3 2 6 2-3h5.5"/></svg><span>Mild</span></button>
+              <button data-value="Strong"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12h3l1.8-5 2 10 2-7 1.7 5h3.5"/></svg><span>Strong</span></button>
+              <button data-value="Very strong"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21 19H3Z"/><path d="M12 10.5v3.2"/><circle cx="12" cy="16.3" r="0.35" fill="currentColor" stroke="currentColor" stroke-width="1.6"/></svg><span>Very strong</span></button>
+            </div>
+          </div>
+
+          <div class="field-block">
+            <label>How do you feel?</label>
+            <div class="choice-row emoji-row" data-choice="feeling">
+              <button data-value="Great"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16 9.5 9l3.5 4 7-8"/><path d="M16.5 5h3.5v3.5"/></svg><span>Great</span></button>
+              <button data-value="Fine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h4l2-3 3 6 2-3h5"/></svg><span>Fine</span></button>
+              <button data-value="Meh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 13c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/></svg><span>Meh</span></button>
+              <button data-value="Poor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 9.5 15l3.5-4 7 8"/><path d="M16.5 19h3.5v-3.5"/></svg><span>Poor</span></button>
+            </div>
+          </div>
+
+          <div class="field-block">
+            <label>Symptoms</label>
+            <div class="chip-wrap" id="symptomChips">
+              <button class="chip">Bloating</button>
+              <button class="chip">Cramping</button>
+              <button class="chip">Gas</button>
+              <button class="chip">Nausea</button>
+              <button class="chip">Reflux</button>
+              <button class="chip">Pain</button>
+              <button class="chip">Fatigue</button>
+              <button class="chip">Headache</button>
+            </div>
+          </div>
+
+          <div class="field-block">
+            <label for="exitNotes">Notes</label>
+            <textarea id="exitNotes" rows="3" placeholder="Anything worth remembering today?"></textarea>
+          </div>
+
+          <button class="primary wide" id="saveExitBtn">Save Exit Interview</button>
+        </section>
+
+        <div class="checker-warning hidden" id="backupReminderBanner">
+          <strong>Back up your diary</strong>
+          <p id="backupReminderText"></p>
+          <button type="button" class="secondary wide" id="backupReminderBtn" style="margin-top:10px">Back up now</button>
         </div>
-
-        <div id="results" class="results hidden"></div>
       </section>
 
-      <!-- Search Tab -->
-      <section id="search" class="tab">
-        <div class="hero">
-          <h2>Search plant species</h2>
-          <p>Browse Pl@ntNet taxonomy and get detailed information</p>
+      <section id="knowledgeView" class="view">
+        <div class="page-heading">
+          <div class="eyebrow">KNOWLEDGE</div>
+          <h1>Understand your triggers</h1>
+          <p>Tap any category for what it is, key symptoms, and what to watch for.</p>
         </div>
-
-        <div class="search-box">
-          <input type="text" id="speciesSearch" placeholder="Scientific or common name (e.g. Acer campestre, rose...)" />
-          <button id="searchBtn" class="btn primary">Search</button>
-        </div>
-
-        <div id="searchResults" class="results"></div>
+        <div class="knowledge-grid" id="knowledgeGrid"></div>
       </section>
 
-      <!-- Settings Tab -->
-      <section id="settings" class="tab">
-        <div class="hero">
-          <h2>Settings</h2>
-          <p>Configure your Pl@ntNet API access</p>
+      <dialog id="knowledgeDialog">
+        <div class="crop-shell knowledge-shell">
+          <div class="dialog-head">
+            <div class="knowledge-title-row">
+              <span class="icon-tile knowledge-icon" id="knowledgeCardIcon"></span>
+              <h2 id="knowledgeCardTitle">Category</h2>
+            </div>
+            <button type="button" class="icon-button" id="closeKnowledgeDialog" aria-label="Close">✕</button>
+          </div>
+          <div id="knowledgeCardBody"></div>
+        </div>
+      </dialog>
+
+      <section id="monthView" class="view">
+        <div class="page-heading">
+          <div class="eyebrow">MONTH</div>
+          <h1>This month</h1>
+          <p>Spot good days, rough days and repeated foods.</p>
+        </div>
+        <div class="filter-bar">
+          <input id="monthFilter" placeholder="Filter by food, ingredient or symptom" />
+        </div>
+        <div class="calendar-weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+        <div class="calendar-grid" id="monthCalendar"></div>
+        <div class="card" id="monthResultsCard">
+          <h3>Filtered entries</h3>
+          <div id="monthResults" class="timeline-list"></div>
+        </div>
+      </section>
+
+
+      <section id="reportView" class="view">
+        <div class="report-hero">
+          <div>
+            <div class="eyebrow">MY INTOLEARN REPORT</div>
+            <h1>Food & symptom insights</h1>
+            <p id="reportPeriod">Your recorded diary</p>
+          </div>
+          <div class="report-brand"><strong>Intolearn</strong><span>Personal report</span></div>
         </div>
 
-        <div class="settings-card">
-          <h3>Pl@ntNet API Key</h3>
-          <p class="hint">
-            Get a free API key at
-            <a href="https://my.plantnet.org/" target="_blank" rel="noopener">my.plantnet.org</a>
-            (500 free identifications/day).
-          </p>
-          <div class="api-key-row">
-            <input type="password" id="apiKeyInput" placeholder="Paste your private API key here" />
-            <button id="saveKeyBtn" class="btn primary">Save</button>
-            <button id="toggleKeyBtn" class="btn secondary">Show</button>
-          </div>
-          <p id="keyStatus" class="status"></p>
+        <div class="report-range">
+          <button type="button" class="range-btn active" data-days="30">30 days</button>
+          <button type="button" class="range-btn" data-days="7">7 days</button>
+          <button type="button" class="range-btn" data-days="90">90 days</button>
+        </div>
 
-          <div class="info-box">
-            <h4>How to use your key in the browser</h4>
-            <ol>
-              <li>Create an account and generate an API key on <a href="https://my.plantnet.org/settings/api-key" target="_blank">my.plantnet.org</a></li>
-              <li>In the API key settings, check <strong>“Expose my API key”</strong></li>
-              <li>Add your domain (or <code>http://localhost:xxxx</code> for local testing) under Authorized domains</li>
-              <li>Paste the key above and click Save</li>
-            </ol>
-            <p class="note">Your key is stored only in your browser’s localStorage and never sent anywhere except to Pl@ntNet.</p>
+        <div id="reportSummary" class="report-summary"></div>
+
+        <section class="report-panel report-highlight hidden" id="knownSuspectsPanel">
+          <div class="report-panel-head"><div><div class="eyebrow">KNOWN SUSPECTS</div><h2>Flagged supplements &amp; meds</h2></div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21 19H3Z"/><path d="M12 10v3.4"/><circle cx="12" cy="16.2" r="0.35" fill="currentColor" stroke="currentColor" stroke-width="1.6"/></svg></span></div>
+          <p class="muted" style="margin-top:-6px">These already have independent evidence against them (a drug label or reference source), so they're shown regardless of how often you take them — unlike the pattern-matching below, which only works for things you don't have every day.</p>
+          <div id="knownSuspects"></div>
+        </section>
+
+        <section class="report-panel report-highlight hidden" id="trialResultsPanel">
+          <div class="report-panel-head"><div><div class="eyebrow">ELIMINATION TRIALS</div><h2>Before, during, after</h2></div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="7.5"/><path d="M6 6.5l10 11"/></svg></span></div>
+          <p class="muted" style="margin-top:-6px">Your own deliberate tests — the strongest evidence here, since you know exactly when the exposure changed rather than inferring it from a pattern.</p>
+          <div id="trialResults"></div>
+        </section>
+
+        <section class="report-panel report-highlight">
+          <div class="report-panel-head"><div><div class="eyebrow">POSSIBLE CONNECTIONS</div><h2>What may be worth noticing</h2></div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></svg></span></div>
+          <div id="reportConnections"></div>
+        </section>
+
+        <section class="report-panel">
+          <div class="report-panel-head"><div><div class="eyebrow">EXPOSURES</div><h2>Most frequently recorded</h2></div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6.5h11M5 12h14M5 17.5h8"/></svg></span></div>
+          <div id="reportExposures"></div>
+        </section>
+
+        <section class="report-panel">
+          <div class="report-panel-head"><div><div class="eyebrow">EXIT INTERVIEW</div><h2>How the period felt</h2></div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="4.5" width="13" height="16" rx="0.5"/><rect x="9" y="3" width="6" height="3" rx="0.5"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></svg></span></div>
+          <div id="reportExit"></div>
+        </section>
+
+        <section class="report-panel">
+          <div class="report-panel-head"><div><div class="eyebrow">DIARY TIMELINE</div><h2>Recorded days at a glance</h2></div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="0.5"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5"/><circle cx="12" cy="14.5" r="1.3" fill="currentColor" stroke="none"/></svg></span></div>
+          <div id="reportTimeline" class="report-timeline"></div>
+        </section>
+
+        <div class="report-disclaimer">Intolearn highlights patterns in your own diary. Associations do not prove that a food caused a symptom and this report is not a medical diagnosis.</div>
+      </section>
+
+      <section id="trendsView" class="view">
+        <div class="page-heading">
+          <div class="eyebrow" id="trendsEyebrow">TRENDS</div>
+          <h1>What may be worth noticing</h1>
+          <p>Intolearn highlights associations — not diagnoses.</p>
+        </div>
+
+        <div class="field-block" style="margin-top:0">
+          <label>Reaction window — how many days after eating still counts</label>
+          <div class="choice-row" data-choice="reactionWindow">
+            <button type="button" data-value="0">Same day</button>
+            <button type="button" data-value="1">Next day</button>
+            <button type="button" data-value="3">Up to 3 days</button>
           </div>
+        </div>
+
+        <div id="trendCards" class="trend-stack"></div>
+
+        <section class="report-panel report-highlight hidden" id="confoundedPairsPanel" style="margin-top:20px">
+          <div class="report-panel-head"><div><div class="eyebrow">WORTH SEPARATING</div><h2>Always logged together</h2></div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></span></div>
+          <p class="muted" style="margin-top:-6px">These never appear apart in your data, so the pattern-matching above can't tell which one (if either) is actually responsible.</p>
+          <div id="confoundedPairs"></div>
+        </section>
+
+        <div class="card helper-card">
+          <h3>How this works</h3>
+          <p id="trendsHowItWorks">Ingredients are compared with symptom days in your local diary. Ingredients logged on almost every day, or without enough repeats, are left out — only ones noticeably above your own baseline symptom rate are shown. The more consistently you log, the more useful this becomes.</p>
         </div>
       </section>
     </main>
 
-    <footer class="footer">
-      <p>
-        MyPlant • Powered by
-        <a href="https://plantnet.org/" target="_blank" rel="noopener">Pl@ntNet</a>
-        recognition API •
-        Data enriched with
-        <a href="https://www.gbif.org/" target="_blank" rel="noopener">GBIF</a>
-      </p>
-    </footer>
+    <nav class="bottom-nav">
+      <button data-view="todayView" class="nav-item active"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1-4-1.4-6-1V17c2 0 4.4.4 6 1.4M12 6.5c1.6-1 4-1.4 6-1V17c-2 0-4.4.4-6 1.4M12 6.5v11.9"/></svg></span><small>Today</small></button>
+      <button data-view="knowledgeView" class="nav-item"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5c-2-1.4-5-1.9-8-1.4v14c3-.5 6 0 8 1.4 2-1.4 5-1.9 8-1.4v-14c-3-.5-6 0-8 1.4Z"/><path d="M12 4.5v14"/></svg></span><small>Learn</small></button>
+      <button data-view="monthView" class="nav-item"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="0.5"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5"/><circle cx="8.3" cy="13.3" r="0.9" fill="currentColor" stroke="none"/><circle cx="12" cy="13.3" r="0.9" fill="currentColor" stroke="none"/><circle cx="15.7" cy="13.3" r="0.9" fill="currentColor" stroke="none"/><circle cx="8.3" cy="16.6" r="0.9" fill="currentColor" stroke="none"/><circle cx="12" cy="16.6" r="0.9" fill="currentColor" stroke="none"/></svg></span><small>Month</small></button>
+      <button data-view="trendsView" class="nav-item"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.2"/><path d="M6.7 12 9 8.7l2 2.4 2.6-4"/><path d="M14.5 14.5 20 20"/></svg></span><small>Trends</small></button>
+      <button data-view="reportView" class="nav-item"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V13M12 20V8M19 20v-6.5"/><path d="M3.5 20.5h17"/></svg></span><small>Report</small></button>
+    </nav>
   </div>
 
-  <!-- Detail Modal -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content">
-      <button class="modal-close" id="modalClose">×</button>
-      <div id="modalBody"></div>
+  <dialog id="mealDialog">
+    <form id="mealForm" novalidate>
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow" id="mealDialogEyebrow">ADD ENTRY</div>
+          <h2 id="mealDialogTitle">Breakfast</h2>
+        </div>
+        <button type="button" class="icon-button" id="closeMealDialog" aria-label="Close">✕</button>
+      </div>
+
+      <section class="barcode-first-card">
+        <div class="barcode-first-icon">▥</div>
+        <div class="barcode-first-copy">
+          <div class="eyebrow">FASTEST OPTION</div>
+          <strong>Scan the product barcode</strong>
+          <small>Intolearn will look up the product, ingredients, allergens and image using Open Food Facts.</small>
+        </div>
+        <button type="button" class="primary barcode-scan-button" id="scanMealBarcodeBtn">Scan barcode</button>
+      </section>
+
+      <div id="mealBarcodeSource" class="barcode-source-note hidden"></div>
+
+      <div id="quickAddWrap" class="quick-add-wrap hidden">
+        <div class="quick-add-label">Quick add — from your history</div>
+        <div id="quickAddChips" class="quick-add-chips"></div>
+      </div>
+
+      <label>Food or product</label>
+      <input id="foodName" placeholder="e.g. Cereal with milk" list="foodNameList" autocomplete="off" />
+      <datalist id="foodNameList"></datalist>
+
+      <label>Time</label>
+      <input id="foodTime" type="time" />
+
+      <label>Ingredients</label>
+      <textarea id="ingredients" rows="4" placeholder="Type ingredients, one per line or comma separated"></textarea>
+
+      <label>Portion size</label>
+      <div class="choice-row" data-choice="foodPortion">
+        <button type="button" data-value="Small">Small</button>
+        <button type="button" data-value="Medium">Medium</button>
+        <button type="button" data-value="Large">Large</button>
+      </div>
+
+      <label>Quantity (optional)</label>
+      <input id="foodQuantity" placeholder="e.g. 2 slices, 1 bowl, a handful" autocomplete="off" />
+
+      <label>Cooking method (optional)</label>
+      <select id="foodCookingMethod">
+        <option value="">Not specified</option>
+        <option value="Raw">Raw</option>
+        <option value="Boiled">Boiled</option>
+        <option value="Steamed">Steamed</option>
+        <option value="Baked">Baked</option>
+        <option value="Roasted">Roasted</option>
+        <option value="Grilled">Grilled</option>
+        <option value="Fried">Fried (pan)</option>
+        <option value="Deep-fried">Deep-fried</option>
+        <option value="Air-fried">Air-fried</option>
+        <option value="Toasted">Toasted</option>
+        <option value="Microwaved">Microwaved</option>
+        <option value="Slow-cooked">Slow-cooked</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <div class="scan-panel">
+        <div>
+          <strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-2px;margin-right:5px"><path d="M4 8.5h3l1.4-2h5.2l1.4 2H20V19H4Z"/><circle cx="12" cy="13.2" r="3.3"/></svg>Ingredient photo fallback</strong>
+          <p>If the barcode is unavailable or the product cannot be found, photograph and crop the ingredient label instead.</p>
+        </div>
+        <div class="photo-choice-row">
+          <label class="secondary file-label photo-choice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-2px;margin-right:5px"><path d="M4 8.5h3l1.4-2h5.2l1.4 2H20V19H4Z"/><circle cx="12" cy="13.2" r="3.3"/></svg>Take photo
+            <input id="ingredientCamera" type="file" accept="image/*" capture="environment" />
+          </label>
+          <label class="secondary file-label photo-choice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-2px;margin-right:5px"><rect x="3.5" y="4.5" width="17" height="15" rx="0.5"/><path d="m4 16 4.5-5 3.5 3.5L16 10l4 5.5"/><circle cx="8.3" cy="8.3" r="1.3"/></svg>Photo library
+            <input id="ingredientLibrary" type="file" accept="image/*" />
+          </label>
+        </div>
+        <div id="scanStatus" class="scan-status hidden"></div>
+        <div id="photoPreview"></div>
+        <div id="detectedFamilies" class="detected-families hidden">
+          <div id="allergenSection" class="tracking-section hidden">
+            <strong>UK allergens detected</strong>
+            <div id="allergenTags" class="family-tags allergen-tags"></div>
+          </div>
+          <div id="otherTrackingSection" class="tracking-section hidden">
+            <strong>Other ingredients worth tracking</strong>
+            <div id="familyTags" class="family-tags"></div>
+          </div>
+          <small>Detected from the scanned ingredient text. Please review before saving.</small>
+        </div>
+      </div>
+
+      <label>Notes</label>
+      <textarea id="foodNotes" rows="2" placeholder="Optional notes"></textarea>
+
+      <div class="dialog-actions">
+        <button type="button" class="danger hidden" id="deleteMealBtn">Delete entry</button>
+        <button type="button" class="secondary" id="cancelMealBtn">Cancel</button>
+        <button type="button" class="primary" id="saveMealBtn">Save entry</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="supplementDialog">
+    <form method="dialog" class="crop-shell" onsubmit="return false">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow" id="supplementDialogEyebrow">ADD ENTRY</div>
+          <h3 id="supplementDialogTitle">Supplement or medication</h3>
+        </div>
+        <button type="button" class="icon-button" id="closeSupplementDialog" aria-label="Close">✕</button>
+      </div>
+
+      <label>What is it?</label>
+      <input id="supplementName" placeholder="e.g. Magnesium citrate, Ibuprofen" list="supplementNameList" autocomplete="off" />
+      <datalist id="supplementNameList"></datalist>
+
+      <label>Type</label>
+      <div class="choice-row" data-choice="supplementKind">
+        <button type="button" data-value="supplement">Vitamin / supplement</button>
+        <button type="button" data-value="prescription">Prescription / OTC drug</button>
+      </div>
+
+      <div id="supplementFrequencyBlock">
+        <label>How often?</label>
+        <div class="choice-row" data-choice="supplementFrequency">
+          <button type="button" data-value="once">Just today</button>
+          <button type="button" data-value="daily">Every day</button>
+          <button type="button" data-value="course">Fixed course</button>
+        </div>
+        <div id="supplementCourseDaysWrap" class="hidden" style="margin-top:12px">
+          <label>Course length (days)</label>
+          <input id="supplementCourseDays" type="number" min="1" max="180" placeholder="e.g. 10" />
+        </div>
+      </div>
+
+      <label>Dose &amp; time</label>
+      <div class="photo-choice-row">
+        <input id="supplementDose" placeholder="e.g. 400mg" />
+        <input id="supplementTime" type="time" />
+      </div>
+
+      <label>Notes</label>
+      <textarea id="supplementNotes" rows="2" placeholder="Optional notes"></textarea>
+
+      <div id="supplementFlagBox" class="checker-warning hidden">
+        <strong id="supplementFlagTitle">Possible GI-related side effects</strong>
+        <p id="supplementFlagText"></p>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="danger hidden" id="deleteSupplementBtn">Delete entry</button>
+        <button type="button" class="secondary" id="cancelSupplementBtn">Cancel</button>
+        <button type="button" class="primary" id="saveSupplementBtn">Save entry</button>
+      </div>
+    </form>
+  </dialog>
+
+
+
+
+  <dialog id="barcodeDialog">
+    <div class="barcode-shell">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow">BARCODE LOOKUP</div>
+          <h2>Scan product barcode</h2>
+        </div>
+        <button type="button" class="icon-button" id="closeBarcodeBtn" aria-label="Close">✕</button>
+      </div>
+
+      <p class="muted barcode-help">Point the camera at the barcode. Intolearn will search Open Food Facts and show the product before anything is added.</p>
+
+      <div id="barcodeReader" class="barcode-reader"></div>
+
+      <div class="barcode-photo-fallback">
+        <label class="secondary file-label photo-choice barcode-photo-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-2px;margin-right:5px"><path d="M4 8.5h3l1.4-2h5.2l1.4 2H20V19H4Z"/><circle cx="12" cy="13.2" r="3.3"/></svg>Take barcode photo
+          <input id="barcodePhoto" type="file" accept="image/*" capture="environment" />
+        </label>
+        <small>If live scanning struggles, photograph the barcode. No crop or ingredient OCR is needed.</small>
+      </div>
+
+      <div class="barcode-manual-row">
+        <input id="manualBarcode" inputmode="numeric" autocomplete="off" placeholder="Or enter barcode number" />
+        <button type="button" class="secondary" id="lookupBarcodeBtn">Look up</button>
+      </div>
+
+      <div id="barcodeStatus" class="scan-status hidden"></div>
+
+      <div id="barcodeProductCard" class="barcode-product-card hidden">
+        <div id="barcodeProductImageWrap" class="barcode-product-image-wrap"></div>
+        <div class="barcode-product-info">
+          <div class="eyebrow">OPEN FOOD FACTS</div>
+          <h3 id="barcodeProductName">Product</h3>
+          <p id="barcodeProductBrand" class="muted"></p>
+          <div id="barcodeAllergenTags" class="family-tags allergen-tags"></div>
+          <p id="barcodeProductCompleteness" class="barcode-completeness"></p>
+          <div id="barcodeIngredientsImageBox" class="barcode-photo-fallback hidden">
+            <img id="barcodeIngredientsImage" alt="Ingredients label photo from Open Food Facts" style="width:100%;max-height:220px;object-fit:contain;background:#fff;margin-bottom:10px" />
+            <small>Open Food Facts has a photo of the label but no transcribed text. Intolearn can try reading it directly.</small>
+            <button type="button" class="secondary wide" id="scanOFFImageBtn" style="margin-top:10px">Scan this label photo</button>
+          </div>
+          <a id="barcodeOFFLink" href="#" target="_blank" rel="noopener" class="secondary wide hidden" style="display:block;text-align:center;text-decoration:none;margin-top:10px">View full product on Open Food Facts</a>
+        </div>
+        <button type="button" class="primary wide" id="useBarcodeProductBtn">Use this product</button>
+      </div>
+
+      <div id="barcodeNotFound" class="barcode-not-found hidden">
+        <strong>Product not found or incomplete</strong>
+        <p>Close this window and use the ingredient-photo fallback, or enter the product manually.</p>
+      </div>
+
+      <div class="barcode-disclaimer">
+        Open Food Facts is community-maintained. For allergies, always verify the original packaging and allergen statement.
+      </div>
     </div>
-  </div>
+  </dialog>
 
-  <script src="app.js"></script>
+  <dialog id="checkerDialog">
+    <div class="checker-shell">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow">INGREDIENT CHECKER</div>
+          <h2>What do you need to avoid?</h2>
+        </div>
+        <button type="button" class="icon-button" id="closeCheckerBtn">✕</button>
+      </div>
+
+      <p class="muted checker-intro">Choose one or more ingredients. Intolearn will look for them in the photographed ingredient text.</p>
+
+      <div class="checker-trigger-grid" id="checkerTriggers">
+        <button type="button" data-trigger="Cereals containing gluten">🌾 Gluten cereals</button>
+        <button type="button" data-trigger="Wheat">🌾 Wheat</button>
+        <button type="button" data-trigger="Milk / dairy">🥛 Milk / dairy</button>
+        <button type="button" data-trigger="Lactose">🥛 Lactose</button>
+        <button type="button" data-trigger="Egg">🥚 Egg</button>
+        <button type="button" data-trigger="Soya">🫘 Soya</button>
+        <button type="button" data-trigger="Peanuts">🥜 Peanuts</button>
+        <button type="button" data-trigger="Tree nuts">🌰 Tree nuts</button>
+        <button type="button" data-trigger="Sesame">🌱 Sesame</button>
+        <button type="button" data-trigger="Fish">🐟 Fish</button>
+        <button type="button" data-trigger="Crustaceans">🦐 Crustaceans</button>
+        <button type="button" data-trigger="Molluscs">🐚 Molluscs</button>
+        <button type="button" data-trigger="Celery">🌿 Celery</button>
+        <button type="button" data-trigger="Mustard">🟡 Mustard</button>
+        <button type="button" data-trigger="Sulphites">⚗️ Sulphites</button>
+        <button type="button" data-trigger="Lupin">🌼 Lupin</button>
+        <button type="button" data-trigger="Onion">🧅 Onion</button>
+        <button type="button" data-trigger="Garlic">🧄 Garlic</button>
+        <button type="button" data-trigger="Chilli">🌶️ Chilli</button>
+        <button type="button" data-trigger="Tomato">🍅 Tomato</button>
+        <button type="button" data-trigger="Legumes / pulses">🫘 Pulses</button>
+        <button type="button" data-trigger="Sweeteners">🍬 Polyol sweeteners</button>
+      </div>
+
+      <button type="button" class="primary wide checker-barcode-btn" id="scanCheckerBarcodeBtn">▥ Scan barcode first</button>
+      <div class="checker-barcode-hint">Uses structured product/allergen data when available. Ingredient-photo OCR remains the fallback.</div>
+
+      <div class="checker-photo-actions">
+        <label class="secondary file-label photo-choice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-2px;margin-right:5px"><path d="M4 8.5h3l1.4-2h5.2l1.4 2H20V19H4Z"/><circle cx="12" cy="13.2" r="3.3"/></svg>Take photo
+          <input id="checkerCamera" type="file" accept="image/*" capture="environment" />
+        </label>
+        <label class="secondary file-label photo-choice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-2px;margin-right:5px"><rect x="3.5" y="4.5" width="17" height="15" rx="0.5"/><path d="m4 16 4.5-5 3.5 3.5L16 10l4 5.5"/><circle cx="8.3" cy="8.3" r="1.3"/></svg>Photo library
+          <input id="checkerLibrary" type="file" accept="image/*" />
+        </label>
+      </div>
+
+      <div id="checkerStatus" class="scan-status hidden"></div>
+      <div id="checkerPreview" class="checker-preview"></div>
+
+      <div id="checkerResult" class="checker-result hidden">
+        <div id="checkerResultIcon" class="checker-result-icon">✓</div>
+        <div>
+          <div class="eyebrow">SCAN RESULT</div>
+          <h3 id="checkerResultTitle"></h3>
+          <p id="checkerResultText"></p>
+          <div id="checkerMatches" class="checker-match-tags"></div>
+        </div>
+      </div>
+
+      <div id="checkerExtractedWrap" class="checker-extracted hidden">
+        <button type="button" class="checker-text-toggle" id="checkerTextToggle">Show scanned ingredient text</button>
+        <div id="checkerExtracted" class="checker-extracted-text hidden"></div>
+      </div>
+
+      <div class="checker-warning">
+        <strong>Important</strong>
+        <p>For a diagnosed food allergy, do not rely on Intolearn alone to decide whether a food is safe. OCR can miss words. Always check the original packaging and allergen statement.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="cropDialog">
+    <div class="crop-shell">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow">CROP LABEL</div>
+          <h2>Frame the ingredients</h2>
+        </div>
+        <button type="button" class="icon-button" id="cancelCropBtn">✕</button>
+      </div>
+      <p class="muted crop-help">Drag and resize the box so it contains only the ingredient list. This usually gives much better recognition.</p>
+      <div class="crop-stage">
+        <img id="cropImage" alt="Photo ready to crop">
+      </div>
+      <div class="dialog-actions crop-actions">
+        <button type="button" class="secondary" id="useFullPhotoBtn">Use full photo</button>
+        <button type="button" class="primary" id="confirmCropBtn">Use crop</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="settingsDialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow">PERSONAL APP</div>
+          <h2>Intolearn settings</h2>
+        </div>
+        <button value="cancel" class="icon-button">✕</button>
+      </div>
+
+      <div class="profile-summary" id="settingsProfileSummary"></div>
+      <button type="button" class="secondary wide" id="editProfileBtn">Edit profile</button>
+
+      <p class="muted" style="margin-top:20px">A clean, printable diary formatted for a GP or dietitian appointment.</p>
+      <button type="button" class="secondary wide" id="openPrintDiaryBtn">Print food diary for a doctor</button>
+
+      <p class="muted" style="margin-top:20px">Your diary is stored only in this browser on this device — there's no cloud sync, so a backup is the only thing standing between you and losing it.</p>
+      <p class="muted" id="lastBackupText" style="margin-top:8px"></p>
+      <button type="button" class="secondary wide" id="exportDataBtn">Back up diary (save or share)</button>
+      <button type="button" class="secondary wide" id="restoreDataBtn" style="margin-top:10px">Restore from backup</button>
+      <input type="file" id="restoreFileInput" accept="application/json" class="hidden" />
+      <button type="button" class="danger wide" id="clearDataBtn" style="margin-top:10px">Clear all local data</button>
+      <p class="muted" id="settingsVersionText" style="margin-top:20px;text-align:center;font-family:var(--font-mono);font-size:11px"></p>
+    </form>
+  </dialog>
+
+  <dialog id="printDiaryDialog">
+    <form method="dialog" class="crop-shell" onsubmit="return false">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow">DOCTOR EXPORT</div>
+          <h3>Print food diary</h3>
+        </div>
+        <button type="button" class="icon-button" id="closePrintDiaryDialog" aria-label="Close">✕</button>
+      </div>
+      <p class="muted" style="margin-top:-6px">Includes what you ate and drank (with quantity and cooking method), supplements/meds taken, and your Exit Interview summary for each day — the same structure most food-diary request forms ask for.</p>
+
+      <label>How many days back</label>
+      <div class="choice-row" data-choice="printDiaryDays">
+        <button type="button" data-value="3">3 days</button>
+        <button type="button" data-value="7">7 days</button>
+        <button type="button" data-value="14">14 days</button>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="secondary" id="cancelPrintDiaryDialog">Cancel</button>
+        <button type="button" class="primary" id="generatePrintDiaryBtn">Generate &amp; print</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="trialDialog">
+    <form method="dialog" class="crop-shell" onsubmit="return false">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow">ELIMINATION TRIAL</div>
+          <h3>Test a suspect ingredient</h3>
+        </div>
+        <button type="button" class="icon-button" id="closeTrialDialog" aria-label="Close">✕</button>
+      </div>
+      <p class="muted" style="margin-top:-6px">Remove it completely for a set period, then reintroduce it deliberately and watch closely — the same method a dietitian would use for a formal elimination/reintroduction test.</p>
+
+      <label>Ingredient or food to eliminate</label>
+      <input id="trialIngredient" placeholder="e.g. Dairy, Gluten, Wheat, Eggs" autocomplete="off" />
+
+      <label>Elimination length (days)</label>
+      <input id="trialEliminationDays" type="number" min="3" max="60" value="14" />
+
+      <label>Reintroduction length (days)</label>
+      <input id="trialReintroDays" type="number" min="1" max="14" value="3" />
+
+      <div class="dialog-actions">
+        <button type="button" class="secondary" id="cancelTrialDialog">Cancel</button>
+        <button type="button" class="primary" id="startTrialBtn">Start trial</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dayDetailDialog">
+    <div class="crop-shell">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow">DAY</div>
+          <h2 id="dayDetailTitle">Day detail</h2>
+        </div>
+        <button type="button" class="icon-button" id="closeDayDetailBtn" aria-label="Close">✕</button>
+      </div>
+      <div id="dayDetailBody"></div>
+    </div>
+  </dialog>
+
+  <dialog id="onboardingDialog">
+    <form method="dialog" class="crop-shell" onsubmit="return false">
+      <div class="dialog-head">
+        <div>
+          <div class="eyebrow" id="onboardingEyebrow">WELCOME</div>
+          <h2 id="onboardingTitle">Let's set up Intolearn</h2>
+        </div>
+        <button type="button" class="icon-button hidden" id="closeOnboardingBtn" aria-label="Close">✕</button>
+      </div>
+
+      <label>What should we call you?</label>
+      <input id="onboardName" placeholder="Your name" autocomplete="off" />
+
+      <label style="margin-top:20px">How will you be using Intolearn?</label>
+      <div class="choice-row choice-row-stack" data-choice="onboardUsage">
+        <button type="button" data-value="learning">Working out what might be affecting me</button>
+        <button type="button" data-value="diagnosed">I already have a diagnosed allergy or intolerance</button>
+        <button type="button" data-value="carer">Checking food or tracking on behalf of someone else</button>
+      </div>
+
+      <label style="margin-top:20px">Add a photo (optional)</label>
+      <div class="photo-choice-row">
+        <label class="secondary file-label photo-choice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-2px;margin-right:5px"><path d="M4 8.5h3l1.4-2h5.2l1.4 2H20V19H4Z"/><circle cx="12" cy="13.2" r="3.3"/></svg>Take photo
+          <input type="file" accept="image/*" capture="user" id="onboardCameraInput">
+        </label>
+        <label class="secondary file-label photo-choice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-2px;margin-right:5px"><rect x="3.5" y="4.5" width="17" height="15" rx="0.5"/><path d="m4 16 4.5-5 3.5 3.5L16 10l4 5.5"/><circle cx="8.3" cy="8.3" r="1.3"/></svg>Choose photo
+          <input type="file" accept="image/*" id="onboardLibraryInput">
+        </label>
+      </div>
+      <div id="onboardPhotoPreview"></div>
+
+      <label style="margin-top:20px">Accent colour</label>
+      <p class="muted" style="margin-top:-6px">Purely personal — doesn't change how anything works, just how it looks.</p>
+      <div class="accent-swatch-row" data-choice="onboardAccent">
+        <button type="button" class="accent-swatch" data-value="amber" style="background:#e2a33c" aria-label="Amber"></button>
+        <button type="button" class="accent-swatch" data-value="orange" style="background:#f2731c" aria-label="Bright orange"></button>
+        <button type="button" class="accent-swatch" data-value="blue" style="background:#2e9bff" aria-label="Electric blue"></button>
+        <button type="button" class="accent-swatch" data-value="pink" style="background:#fc8eac" aria-label="Flamingo pink"></button>
+        <button type="button" class="accent-swatch" data-value="teal" style="background:#1bc0ba" aria-label="Teal"></button>
+      </div>
+
+      <label style="margin-top:20px" id="onboardAllergyLabel">Any known allergies or intolerances?</label>
+      <p class="muted" style="margin-top:-6px" id="onboardAllergyHint">Optional — these become your default selection in Ingredient Checker.</p>
+      <div class="checker-trigger-grid" id="onboardingTriggers">
+        <button type="button" data-trigger="Cereals containing gluten">🌾 Gluten cereals</button>
+        <button type="button" data-trigger="Wheat">🌾 Wheat</button>
+        <button type="button" data-trigger="Milk / dairy">🥛 Milk / dairy</button>
+        <button type="button" data-trigger="Lactose">🥛 Lactose</button>
+        <button type="button" data-trigger="Egg">🥚 Egg</button>
+        <button type="button" data-trigger="Soya">🫘 Soya</button>
+        <button type="button" data-trigger="Peanuts">🥜 Peanuts</button>
+        <button type="button" data-trigger="Tree nuts">🌰 Tree nuts</button>
+        <button type="button" data-trigger="Sesame">🌱 Sesame</button>
+        <button type="button" data-trigger="Fish">🐟 Fish</button>
+        <button type="button" data-trigger="Crustaceans">🦐 Crustaceans</button>
+        <button type="button" data-trigger="Molluscs">🐚 Molluscs</button>
+        <button type="button" data-trigger="Celery">🌿 Celery</button>
+        <button type="button" data-trigger="Mustard">🟡 Mustard</button>
+        <button type="button" data-trigger="Sulphites">⚗️ Sulphites</button>
+        <button type="button" data-trigger="Lupin">🌼 Lupin</button>
+        <button type="button" data-trigger="Onion">🧅 Onion</button>
+        <button type="button" data-trigger="Garlic">🧄 Garlic</button>
+        <button type="button" data-trigger="Chilli">🌶️ Chilli</button>
+        <button type="button" data-trigger="Tomato">🍅 Tomato</button>
+        <button type="button" data-trigger="Legumes / pulses">🫘 Pulses</button>
+        <button type="button" data-trigger="Sweeteners">🍬 Polyol sweeteners</button>
+      </div>
+
+      <button type="button" class="primary wide" id="onboardingSaveBtn" style="margin-top:20px">Get started</button>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="printDiaryContainer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+  <script src="app.js?v=86"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(err => {
+          console.warn("Service worker registration failed", err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>

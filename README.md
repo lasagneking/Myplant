@@ -1,53 +1,230 @@
-# MyPlant 🌿
+# Intolearn
 
-A modern web app for **AI plant identification** with full **Pl@ntNet** integration and GBIF enrichment.
+Personal-use prototype. Current build: **v9.3**.
 
-## Features
+## Run it
 
-- **Identify plants** from 1–5 photos (flower, leaf, fruit, bark, or auto)
-- Confidence scores, scientific & common names, family/genus
-- Choose flora/project (World, Useful plants, Weeds, Invasive…)
-- Multi-language common names
-- **Species search** against Pl@ntNet taxonomy
-- Name alignment / synonym resolution
-- **Rich details** via GBIF (full taxonomy, vernacular names, media)
-- Links to GBIF and POWO (Plants of the World Online)
-- Clean dark UI, fully client-side, API key stored only in your browser
+Open `index.html` in a modern browser, or serve the folder locally:
 
-## Quick start
+```bash
+python -m http.server 8000
+```
 
-1. Get a free API key at [https://my.plantnet.org](https://my.plantnet.org)  
-   (500 identifications/day free)
+Then open http://localhost:8000
 
-2. Open `index.html` in a browser **or** serve the folder:
+Install it as a PWA (Add to Home Screen on iOS/Android) for an app-like experience with an offline-capable app shell.
 
-   ```bash
-   # Python
-   python -m http.server 8080
+## What it does
 
-   # or Node
-   npx serve .
-   ```
+- **Food diary**: Breakfast, Lunch, Dinner, Snacks & Drinks, with time, ingredients and notes per entry. Entries can be added, edited and deleted.
+- **Barcode lookup**: scan a product barcode (live camera via Quagga2, or photograph/manually enter the number) to pull product name, brand, image, ingredients and allergen data from Open Food Facts. Looked-up products are cached locally so repeat scans of the same barcode are instant and work offline.
+- **Ingredient photo fallback**: when a barcode isn't available, photograph and crop the ingredient label. Browser-based OCR (Tesseract.js) reads the text and inserts it into the Ingredients field for review/editing.
+- **Ingredient Checker**: pick specific ingredients/allergens you want to avoid, then scan a barcode or photo to check for them before eating.
+- **Automatic tagging**: detects the 14 UK/EU legally-defined allergens (cereals containing gluten, milk, egg, soya, nuts, sesame, fish, crustaceans, molluscs, celery, mustard, sulphites, lupin) plus other commonly-relevant ingredients (onion, garlic, tomato, chilli, legumes, polyol sweeteners).
+- **Exit Interview**: a quick daily check-in — bathroom frequency, consistency, urgency, general feeling, symptoms and notes.
+- **Week / Month views**: recent entries at a glance, plus a filterable calendar for the month.
+- **Report**: a shareable-style summary (7/30/90-day ranges) covering days recorded, meals, scans, Exit Interviews, "possible connections" between logged ingredients and symptom days, most frequent exposures, and a day-by-day timeline.
+- **Trends**: the same association logic surfaced as standalone cards, using raw ingredient names rather than allergen/family groupings.
+- **Backup/Restore**: export the whole diary as JSON from Settings.
 
-3. Go to **Settings**, paste your API key, and save.
+## How the pattern/association logic works
 
-4. Important for browser use:
-   - On my.plantnet.org → API key settings → check **“Expose my API key”**
-   - Add your origin (e.g. `http://localhost:8080`) under **Authorized domains**
+Both the Report's "Possible connections" and the Trends tab compare ingredients against symptom days, with two deliberate design choices:
 
-## How it works
+1. **A configurable reaction window** (Trends → "Reaction window"): Same day / Next day (default) / Up to 3 days. A day counts as a "reaction" if symptoms were logged anywhere within that window, since delayed food reactions vary a lot person to person — there's no single correct default, so rather than guess at a fixed lag or a clever decay-weighted scheme neither of us could validate against your actual body, it's just an explicit, transparent setting you control. Widening it catches more genuinely delayed reactions, but also more coincidences — the tradeoff is real either way, so this is deliberately visible rather than hidden behind one hardcoded assumption. It affects both Trends and Report (Possible Connections, Known Suspects) — one setting, not two to keep in sync — and persists in its own `localStorage` key (`intolearn_reaction_window_v1`), separate from your diary.
+2. **A personal baseline, not a raw rate.** Ingredients you eat almost every day are excluded (they can't tell you anything — everything correlates with them). Of what's left, only ingredients whose symptom rate is meaningfully above your own overall baseline rate are shown, rather than anything that's ever co-occurred with a symptom twice.
 
-| Action              | Pl@ntNet endpoint                          | Extra data      |
-|---------------------|--------------------------------------------|-----------------|
-| Identify from photo | `POST /v2/identify/{project}`              | + related images |
-| Search species      | `GET /v2/projects/.../species?prefix=`     |                 |
-| Align name          | `GET /v2/projects/.../species/align`       |                 |
-| Plant details       | GBIF Species API                           | taxonomy, names, media |
+This still isn't a diagnosis — it's association within your own logged data, and confounding (multiple ingredients eaten the same day) isn't controlled for. The more consistently you log, the more the numbers mean.
 
-## Credits
+## Knowledge tab (replaces Week, v7.7)
 
-- Plant identification engine: [Pl@ntNet](https://plantnet.org/)
-- Biodiversity data: [GBIF](https://www.gbif.org/)
-- Taxonomy references: POWO / Kew
+The Week tab was removed — checking the actual code, it only ever showed a 7-day mood strip, three basic counts, and a flat entry list, all of which Month (a full calendar, tappable into a richer per-day breakdown) or Today already covered better. Its nav slot is now "Learn": a grid of the same 22 allergen/intolerance categories used in Ingredient Checker and onboarding, each opening a reference card — what the condition is, key symptoms with icons, and a "Good to know" note.
 
-The image-based plant species identification service is based on the Pl@ntNet recognition API, regularly updated and accessible through https://my.plantnet.org/
+**Content is supplied externally, not generated by Claude** — all 22 categories are now populated (as of v8.0) via `registerKnowledgeCards()` calls in `app.js`, in this structure:
+```js
+{
+  "CategoryName": {
+    description: ["paragraph one", "paragraph two"],
+    symptoms: [{icon:"bloating", title:"Bloating & wind", text:"..."}],
+    goodToKnow: "..."
+  }
+}
+```
+Symptom icons come from a shared `SYMPTOM_ICONS` map (bloating, abdominalPain, diarrhoea, fatigue, headache, brainFog, nausea, vomiting, skin, joint, breathing, swelling, dizziness, wind, gurgling, mouth, constipation, heartburn) rather than one-off icons per card, so "Fatigue" always uses the same icon everywhere it appears — add to that map as new symptom concepts show up in future cards, rather than inventing a new icon per card. `registerKnowledgeCards()` merges into the existing set rather than replacing it, so each new batch is its own call and never wipes what's already there.
+
+**Card open/close transition (v8.1)**: tapping a tile opens the card with a zoom + fade (scales from 92% while fading in, backdrop darkens at the same time; ~220ms), rather than the instant snap-open every other dialog in the app uses. This is deliberately scoped to `#knowledgeDialog` only — every other dialog still opens instantly — since a Knowledge card is browsed casually and repeatedly, unlike a form dialog you want to get in and out of fast. Native `<dialog>` elements don't animate open/close by default; this uses the standard "toggle a class on the next animation frame" technique so the CSS transition has something to transition from, and on close, waits for the transition to actually finish (with a timeout safety net) before calling the real `.close()` — otherwise the dialog would vanish instantly and only the backdrop would fade.
+
+**Grid tile layout fix (v8.2)**: the tiles looked like "big boxes with tiny icons" — a real bug, not just a style call. The icon-tile box had been sized up to 42px, but the SVG inside is sized via the tile's `font-size` (controls `1em`), which hadn't been scaled to match, so the box grew while the icon stayed small. Fixed by setting both together (54px box, 27px font-size) and switching from a stacked icon-above-text layout to icon-left-text-right, single column instead of two — two columns crammed the longer names ("Cereals containing gluten," "Legumes / pulses") into too little space once the icon got bigger.
+
+**"Mine" markers (v8.4)**: any category in your onboarding allergy list gets a thin amber left-edge and a small "MINE" tag in the Learn grid, so browsing the full 22 immediately shows which ones are actually yours versus general reference. Recalculates whenever the profile's allergy list changes (onboarding, Edit profile, restoring a backup, clearing local data) — never stale.
+
+**Cross-links back to Learn (v8.4)**: ingredient/category names shown in Trends, Report (Possible Connections, Exposures), and Ingredient Checker's match results are now tappable straight into the matching Learn card — so seeing "Wheat" flagged as a possible suspect leads directly to what that means, rather than requiring a trip to the Learn tab and a search. Matching reuses `checkerTriggerTerms` (the same term lists that already power ingredient-label scanning) rather than a second list to maintain, so "cheese" correctly resolves to "Milk / dairy" and "oats" to "Cereals containing gluten." A name that doesn't confidently match any of the 22 categories — a supplement name, a portion/cooking tag — just renders as plain text; nothing is guessed past what the term lists actually support. Deliberately *not* applied to Known Suspects (supplement/medication names) or individual food-entry ingredient tags in the diary — the former would produce nonsense matches, the latter would turn every meal entry into a wall of clickable text.
+
+## Portion size & cooking method
+
+Every food entry now also captures a rough **portion size** (Small/Medium/Large, defaulting to Medium), an optional free-text **quantity** (e.g. "2 slices", "1 bowl" — for when a count matters more than relative size), and an optional **cooking method** (raw, boiled, roasted, fried, air-fried, etc.).
+
+These aren't just descriptive — they're clinically relevant and worth a medical professional's attention:
+- Most food *intolerances* (as opposed to true allergies) are dose-dependent — a splash of milk versus a bowl of cereal can be the difference between fine and symptomatic. Without portion context, "had milk, had symptoms" and "had milk, no symptoms" look identical in the data.
+- Cooking method matters for conditions like Oral Allergy Syndrome (pollen-food cross-reactivity), where many people tolerate a cooked version of a fruit/vegetable that raw would trigger symptoms — an apparent inconsistency in a diary ("apple was fine Tuesday, wasn't Thursday") can turn out to be fully explained by raw vs. cooked.
+
+"Large portion" and each cooking method also feed into the same correlation engine used for ingredients (Report → Possible Connections, Trends) — so "large portions" or "fried food" specifically can surface as their own pattern, separate from the ingredient itself.
+
+## Month view
+
+The calendar week now starts Monday (UK convention) with day-of-week headers above the grid. Good/rough/mixed days carry a soft glow matching their colour, on top of the existing background tint and border — a deliberate exception to the flat/no-glow system, same reasoning as the pulsing side-effect flags: these are the two places in the app meant to catch your eye at a glance rather than blend in.
+
+Tapping any day opens a read-only breakdown (Exit Interview summary, each meal, supplements/meds logged that day) — and tapping any entry within that breakdown jumps straight into its full edit dialog, the same one used from Today.
+
+## Backup & restore (Settings)
+
+There's no cloud sync — everything lives in this browser's `localStorage` on this one device, so a backup is the only real protection against a cleared cache, a browser update gone wrong, or switching phones.
+
+- **Back up**: on iOS/Safari this uses the native Share Sheet (`navigator.share` with a file), so "Back up now" lets you save straight to Files/iCloud Drive, AirDrop it, or send it to yourself — not just a browser download, which behaves inconsistently for an installed home-screen PWA anyway. Falls back to a plain download on browsers that don't support file sharing.
+- **Restore**: pick a previously-saved backup file and it replaces everything currently in this browser, after a confirmation showing how many days are in each side of the swap. This didn't exist before v7.6 — there was an export button but no way back in, which meant it wasn't really a backup, just a one-way dump.
+- **The reminder**: a quiet "Back up your diary" notice appears at the bottom of Today, but only once there's at least 5 days of real data logged *and* it's been 21+ days since the last backup (or you've never done one). No badge, no red dot, no daily nagging — it disappears the moment you back up, and stays invisible entirely until there's something worth losing.
+- **Known limitation**: restoring is a full replace, not a merge — if you've logged new entries on this device since your last backup, restoring an older file loses them. Worth exporting immediately before restoring if that matters to you.
+
+## Data & privacy
+
+Whether each Today section (Breakfast, Lunch, Dinner, Snacks & Drinks, Supplements & meds) is collapsed or expanded is a display preference, stored under its own `localStorage` key (`intolearn_collapse_v1`) separate from your diary — so it doesn't clutter JSON exports or feed into the correlation engine.
+
+Your diary, product cache and settings are stored only in `localStorage` in this browser, on this device — nothing is sent to a server except the barcode lookups to Open Food Facts and the OCR/scanning libraries, which run client-side. There is no account, sync, or automatic backup: use **Settings → Export diary as JSON** periodically if you don't want to risk losing data to a cleared browser, reinstalled PWA, or new device.
+
+Ingredient photos are compressed before being stored (resized and re-compressed to keep `localStorage` usage low over months of logging); the original high-resolution photo is only used transiently for OCR and isn't kept.
+
+## Offline behaviour
+
+A service worker (`sw.js`) precaches the app shell (HTML/CSS/JS, icons), the Google Fonts stylesheet, and the third-party libraries (Quagga2, Tesseract.js, CropperJS) on first successful load, so the app continues to open and basic scanning/cropping keeps working without a connection afterwards. Barcode lookups against Open Food Facts still require a connection; cached products (already looked up once) work offline.
+
+**If you edit `app.js`, `styles.css`, `index.html`, or the icons: bump `CACHE_VERSION` in `sw.js`, AND bump the `?v=NN` query string on both the `app.js` and `styles.css` `<link>`/`<script>` tags in `index.html` (keep them in sync — a mismatch was the cause of a real bug in v5.4, where a stale cached stylesheet had no rule for a new element the JS had started injecting, and it rendered fully unstyled).** Otherwise installed devices, and even a plain browser HTTP cache with no service worker involved, may keep serving an old file indefinitely.
+
+## Onboarding & profile
+
+On first launch, Intolearn asks for a name (used for the "Good morning/afternoon/evening" greeting), **how you're using the app** (v8.3 — see below), an optional photo (replaces the settings gear in the top bar with your photo, or your initial if no photo is set), and any known allergies/intolerances — picked from the same 22-item list used in Ingredient Checker. Whatever's selected there becomes the **default pre-selected set** every time you open Ingredient Checker afterward; you can still add or remove ingredients per-check without changing your saved defaults.
+
+Tap your avatar (top right) → **Edit profile** to change any of this later. "Clear all local data" in Settings also resets the profile and re-triggers onboarding, since it's a fresh start.
+
+### Usage type (v8.3)
+
+Three options: *working out what's affecting me*, *already have a diagnosed allergy/intolerance*, or *checking food/tracking for someone else* (parent, carer, teacher). This is stored as `state.profile.usageType` and currently does one thing: it reframes the allergy question right after it — "any *known or suspected*" (learning) vs. "what do you need to watch for" (diagnosed) vs. "what are you checking for" (carer) — so the same question doesn't feel like it's assuming a diagnosis you don't have, or being vague when you already know exactly what you're avoiding.
+
+**Scope boundary, stated plainly**: this does *not* create separate profiles or a separate diary for someone else. Intolearn's entire data model is single-profile — one name, one set of allergies, one diary. A carer selecting "checking for someone else" is still answering as themselves, on the one profile that exists; there's no way to track, say, a parent's own reactions separately from a child's in the same install. True multi-profile support (switching between "who you're tracking for," each with their own diary/allergies/history) would be a significantly larger feature — a real data-model change, not an onboarding tweak — and hasn't been built.
+
+### Accent colour (v8.5)
+
+Five options, picked during onboarding or changed anytime via avatar → Edit profile: Amber (default), Bright orange, Electric blue, Flamingo pink, and `#1bc0ba` (closest common name: Light Sea Green). Purely a `--trace` swap — `--safe` (comfortable/clear) and `--flag` (symptom/allergen warnings) never change, since those carry meaning independent of personal taste and shouldn't be muddled with a decorative preference.
+
+Tapping a swatch previews it live immediately (including on the dialog's own "Get started"/"Save profile" button, which uses the accent colour itself) — closing or cancelling without saving reverts to whatever was active before you opened the dialog, so an unsaved preview never sticks around.
+
+**A real bug this surfaced and fixed along the way**: several places in `styles.css` used hardcoded amber RGB values (`rgba(226,163,60,...)`) for tinted backgrounds — the calendar's "warn" day glow, the warning-box backgrounds, the OCR "working" status — rather than referencing the accent variable. Those would have stayed amber regardless of the chosen theme. Fixed by introducing `--trace-rgb` (the same colour as raw comma-separated components) alongside `--trace`, and converting every hardcoded instance to `rgba(var(--trace-rgb), alpha)`. Any *new* CSS that needs a tinted/translucent version of the accent colour should use this pattern too, not a fresh hardcoded triple — otherwise it'll quietly ignore the user's chosen colour, the same bug all over again.
+
+**A second bug this shipped with (fixed in v8.6)**: the initial `applyAccentTheme(...)` call was placed immediately after `let state = loadState();`, near the very top of the script — but `const ACCENT_THEMES` and `function applyAccentTheme` weren't defined until much later in the same file. In JavaScript, calling a function whose body references a `const` that hasn't been reached yet in top-to-bottom execution throws a `ReferenceError` (the "temporal dead zone"), and an uncaught error like that stops the entire script from running any further. That took down everything defined after it — the avatar/photo rendering, the Settings click handler, the meal cards, the mood icon — all in one go, which is why several seemingly unrelated things broke together. Fixed by moving the startup call down to sit alongside the other startup renders (`renderAvatar()`, `renderGreeting()`, etc.), which already run after every function and constant in the file has been defined. The lesson for any future startup code: a call that runs immediately (not inside an event handler) must physically come after everything it references in the file, not just be logically related to it.
+
+**What doesn't change**: the app icon and any other baked PNG assets are fixed at whatever colour they were generated with — a runtime CSS variable can't reach into a raster image. Same iOS limitation as before applies on top of that (the home-screen icon only updates on delete-and-reinstall regardless).
+
+## Visual identity
+
+v5.0 moved off the original light green theme to a dark, editorial "field notebook" look: near-black warm charcoal background, parchment-toned text, Fraunces for headlines, Archivo for body/UI, IBM Plex Mono for labels and data. Three accent colours carry meaning rather than decoration: amber (`--trace`) for active/tracking states, teal (`--safe`) for comfortable/clear results, rust (`--flag`) for symptom/allergen flags. All colours and fonts are CSS custom properties in `styles.css` (`:root`) — change them there rather than hunting through individual rules.
+
+All icons are hand-drawn single-stroke line SVGs using `currentColor` (so they inherit ink/amber automatically on selected/active states) — this includes the 22-item allergen/trigger grid shared by Ingredient Checker and onboarding (v6.2), which was the last remaining spot still using native emoji. The icon set lives in the `ICONS` and `ALLERGEN_ICONS` objects near the top of `app.js`; `renderAllergenGridIcons()` applies the allergen set to both grid instances from one shared map, rather than duplicating 22 SVGs twice in the HTML.
+
+The top bar (v6.7, expanded v7.5) has five of those same icons (wheat, milk, egg, peanut, chilli) drifting very faintly behind the wordmark — `opacity:.05`, independent CSS keyframe loops, 33-48s per cycle (sped up in v7.5 from an original 50-74s, and given two more icons once the safe-area-inset fix opened up extra vertical room in the header). It's `aria-hidden` and wrapped in `@media (prefers-reduced-motion: no-preference)`, so it's silent to screen readers and simply doesn't animate for anyone with that OS setting on. Since this sits on every screen (unlike the calendar glow or side-effect pulse, which only appear when relevant), it's deliberately the most restrained of the "exception to flat design" moments — meant to be felt more than seen.
+
+**App icon (v7.3)**: redesigned again after the magnifying-glass version turned out too muddy at real icon size — replaced with a bold italic "I" (echoing the wordmark's first letter) with a two-leaf sprout growing out of the top, plus the same small amber accent dot used on tile icons throughout the app. Simpler than the magnifying-glass version, reads clearly even at 192px, and ties directly to the wordmark rather than being a separate illustration. Built as one SVG (`icon-192.png`, `icon-512.png`, `apple-touch-icon.png` all rasterized from it) rather than three hand-edited files.
+
+**Important iOS limitation**: the home-screen icon is captured once when you "Add to Home Screen" and does not refresh automatically afterward — this isn't a caching issue cache-busting can fix, it's just how iOS handles PWA icons. To see the new icon, delete the existing Intolearn icon from the home screen and re-add it via Safari's "Add to Home Screen" again.
+
+## Printable food diary for a doctor (Settings → "Print food diary for a doctor")
+
+Generates a clean, light-background printable page covering the last 3/7/14 days: for each day, a table of everything eaten and drunk (time, meal, food, quantity, cooking method, notes), plus supplements/meds taken and an Exit Interview summary. Structured to match what a typical NHS dietetic food-diary request form asks for — time-stamped entries, household-measure quantities, and how food was prepared, though of course actual requirements vary by service, so it's always worth checking what your specific appointment letter asks for.
+
+It uses the browser's native print (Share → Print → Save to PDF on iOS), not a generated PDF file — no extra library needed, and it works offline. This is the one screen in the app that deliberately breaks from the dark theme: black text on white, since that's what actually prints and photocopies well.
+
+**A real bug in this, found and fixed in v8.9**: extra pages of solid black used to show up after the actual content — real content in the print output, but full black pages tacked on afterward. Root cause: the technique hiding the rest of the app used `visibility:hidden` on everything, which makes elements invisible but still keeps their layout space — so the full height of the app (topbar, Today's cards, everything) was still influencing how many physical pages got generated, even though none of it was meant to be there. Since `body`'s own dark background was never explicitly hidden (a `body *` selector hides descendants of body, not the body element itself), any page beyond where the actual printable content ended just showed that dark background with nothing on top of it. Fixed by switching to `display:none` on the app shell instead, which removes it from layout entirely — the printed document's height now matches the actual content, with no leftover blank/black pages.
+
+**Gaps worth knowing about**: some food-diary request forms (particularly for weight-management services) also ask for hunger/fullness ratings, why you were eating, mood, and physical activity/exercise — Intolearn doesn't have dedicated fields for any of those. Mood is partially covered by Exit Interview's "how do you feel," but hunger/fullness and exercise aren't tracked at all currently. If your own appointment specifically asks for those, the per-meal Notes field is a reasonable place to jot them freehand — they'll show up in the "Notes" column of the printout.
+
+## App version (Settings, v9.1)
+
+A plain "Intolearn v9.1" line at the bottom of Settings. This exists specifically to kill a recurring debugging problem in this project's history: because the app is a cache-heavy PWA (service worker + browser HTTP cache + iOS's own icon caching), "is this actually broken, or am I looking at a stale cached copy of an older build" has come up repeatedly. Checking the version number after a reload now answers that in one glance instead of a back-and-forth.
+
+## Confounding isolator (Trends, v9.1)
+
+A new "Worth separating" panel on Trends surfaces pairs of foods/ingredients that have never once been logged apart — meaning the correlation engine above it genuinely cannot tell which one (if either) is responsible for anything, since there's no day with one but not the other to compare against. Each pair gets a one-tap "Test [X] alone" / "Test [Y] alone" button that opens Elimination Trial pre-filled with that ingredient, turning the observation directly into an action rather than just a note.
+
+Three filters keep this from being noisy:
+- **Only ingredients that map to a recognised allergen/intolerance category** (v9.2 fix, via the same `matchKnowledgeCategory` matcher used to cross-link Trends/Report to Learn). Without this, generic cooking staples — salt, water, sugar, rapeseed oil — trivially "never appear apart" simply because they're in most recipes, not because of any real entanglement worth testing. Real bug found the same day this feature shipped: the pairing logic was treating every raw ingredient word as a candidate, so it happily surfaced "Salt & Water" as something to isolate.
+- **Minimum 3 overlapping days** — a single coincidence isn't a pattern.
+- **Excludes anything present on more than 75% of all logged days** as a *partner* in a pair — an ingredient you have almost daily "confounds" with everything trivially and isn't a useful thing to flag (it can still appear as the *less frequent* item in a pair with something rarer). This mirrors the same reasoning already used to exclude near-daily ingredients from Trends/Report itself.
+
+This only checks food/supplement co-occurrence, not causation or symptom timing — it's a data-quality observation ("you can't separate these yet"), not a claim that either ingredient actually matters.
+
+## Logging streak (Today, v9.1)
+
+A quiet line under the Today hero card — "N-day logging streak" — counting consecutive days with at least one real entry (a meal, an Exit Interview, or a supplement/med), not just days the app happened to be opened. Deliberately not gamified: no fire icon, no counter that resets to a shaming "0-day streak" message — if there's no current streak, the line is simply blank rather than displaying a discouraging zero. Today not being logged yet doesn't break the streak either, since the day isn't over — it only breaks once a day genuinely passes with nothing logged.
+
+## Open Food Facts: reading more than structured text (v9.0)
+
+Real gap found and closed: Open Food Facts has several layers of data per product, and the barcode lookup was only ever reading the structured, contributor-transcribed layer (`ingredients_text`, `allergens_tags`, and their derived fields). Plenty of products — like the one that surfaced this — have an actual **photo of the ingredients label** uploaded (`image_ingredients_url`) with nobody having transcribed it into text yet. The app was requesting that field from the API at all, so it had no way to know the photo existed, even though a person browsing the same product on Open Food Facts' own site could see it right there.
+
+Now: that field is requested and stored (cache schema bumped to force already-cached products, like this one, to refetch with the new field rather than staying stuck on the old incomplete data). When structured allergen data is genuinely unavailable but a label photo exists, the barcode result shows that photo directly plus a **"Scan this label photo"** button — which fetches it and runs it through the same OCR/UK-allergen-detection logic used for a user's own photos, updating the product card in place (and the local product cache, so it doesn't need re-scanning next time you look this barcode up). If the fetch fails for any reason (network, or Open Food Facts not permitting cross-origin fetches for that particular asset), it fails quietly with a toast rather than breaking anything — the photo is still visible either way for a manual check.
+
+**Follow-up (v9.3)**: the v9.0 fix only helps when a photo has been through Open Food Facts' extra step of being specifically tagged as "the ingredients label" (`image_ingredients_url`) — a separate action from just uploading a picture of the pack. A newly-added or lightly-curated product (confirmed against a real example: McCoy's Coated Peanuts, which had only just launched) can easily have photos uploaded with nobody having done that tagging step yet, meaning both `ingredients_text` and `image_ingredients_url` come back empty even though the product genuinely has data visible on Open Food Facts' own site. Rather than guess at Open Food Facts' internal raw-image storage format to work around this (which risks trading "no data" for a broken image link if the guess is wrong), the fix is a **"View full product on Open Food Facts"** link, shown whenever Intolearn doesn't have a confident structured answer — it always works, since it's just the product's page however its data happens to be organised, and it gives you the same view you'd get finding the product yourself.
+
+## Elimination trials
+
+Everything else in Intolearn watches passively and reports patterns after the fact. This is the one feature that lets you actually *test* a suspect deliberately — the same elimination/reintroduction method a dietitian would run.
+
+**Starting one** (Today → "Start a trial"): name what you're removing, how many days to eliminate it, how many days to reintroduce it afterward (defaults: 14 and 3). From that point on, Today shows a running "Day X of Y — eliminating/reintroducing [ingredient]" status instead of the launch card, computed purely from dates — no daily check-in required.
+
+**Contamination watch**: while a trial is in its eliminating phase, saving a food entry checks the name and ingredients against what you're eliminating. A match doesn't block the save — it just swaps the usual "Entry saved" toast for a heads-up, so an accidental slip doesn't quietly go unnoticed and doesn't need to be treated as a hard rule you might resent.
+
+**Results** (Report → "Elimination Trials", above Possible Connections): for each trial, past or in-progress, a symptomatic-day rate for the week *before* the trial started, during elimination, and during reintroduction. This is placed above the passive Possible Connections panel deliberately — a trial you ran and controlled yourself is stronger evidence than a correlation the app inferred, and the ordering reflects that.
+
+**Honest limits**: one trial's "before" baseline is only 7 days and isn't itself immune to coincidence — a single trial suggests, it doesn't prove. Multiple foods eaten during the same window still aren't disentangled from each other. And like everything else here, this isn't a diagnosis; it's a more structured way of gathering your own evidence, which a clinician can act on more easily than the same evidence would be without something like this to keep it consistent.
+
+## Supplements & medications
+
+A separate "Supplements & meds" section on the Today screen logs vitamins, supplements, and prescription/OTC drugs alongside food — because these can cause GI symptoms indistinguishable from a food intolerance, and were previously invisible to the diary entirely.
+
+Each entry gets a **silent side-effect check**, tiered by what data actually exists:
+
+- **Vitamins/supplements**: checked against a small curated reference list of common GI-related side effects (magnesium, iron, fish oil, probiotics, high-dose vitamin C, etc.). There's no free, authoritative structured database for supplement side effects (they aren't FDA-regulated the way drugs are), so this list is a practical starting point, not a comprehensive one — treat it as a nudge to Google the specific product, not a verdict.
+- **Prescription/OTC drugs**: checked against [openFDA's public drug label API](https://open.fda.gov/apis/drug/label/) (free, no key required) by brand or generic name, scanning the label's adverse-reactions/warnings text for GI-symptom keywords (diarrhoea, nausea, bloating, cramping, etc.).
+
+The lookup runs **after** the entry is saved and the dialog is closed — it never blocks on a slow or missing network connection, and if it finds nothing (or the request fails), nothing is shown. If it does find a match, a tag appears on the entry, e.g. "Diarrhoea, Bloating" with its source.
+
+Separately from that flag, supplement and medication names are also fed into the same pattern-matching engine used for food ingredients (Report → Possible connections, Trends), so if your own data shows a personal correlation the database wouldn't know about — say, your specific fish oil brand — that still surfaces on its own.
+
+### Known suspects vs. Possible connections
+
+These are two deliberately different systems, and it matters which one you're reading:
+
+- **Possible connections** (Report, Trends) finds patterns in *your* data only — it has no idea what a drug label says. It also excludes anything you have on more than ~85% of your logged days, because there's no symptom-free contrast day to compare against, so it can't tell you anything about something you take constantly.
+- **Known suspects** (Report, above Possible connections) shows every currently-flagged supplement/medication regardless of how often you take it, because a database flag is independent evidence that doesn't need a statistical contrast day to be worth acting on. A daily antibiotic that's *already* known to cause diarrhoea would be invisible to Possible connections but still shows here.
+
+The Today screen also shows a quiet "Worth keeping in mind today" notice whenever something logged for today has a side-effect flag — it only appears when relevant, so it doesn't compete with the main food-logging flow on ordinary days.
+
+### Recurring courses
+
+When adding a new supplement or medication, "How often?" offers three options:
+- **Just today** — a one-off entry, the original behaviour.
+- **Every day** — logs itself automatically every day from now on, with no need to re-enter it, until you tap **Stop** on it (shown in a small "active courses" list on the Today screen).
+- **Fixed course** (e.g. a 10-day antibiotic) — logs itself automatically for exactly that many days, then stops on its own.
+
+Each day's entry is a normal, independent diary entry once created (editing one day doesn't change other days), so the correlation engine and Report see them exactly like any other entry. Deleting a single day's auto-logged entry only skips that one day — the course keeps running; use **Stop** on the course itself to end it early. Recurrence can only be set when creating a new entry, not when editing an existing one, to avoid accidentally spinning up a second course.
+
+**Known limitation**: the openFDA lookup depends on that API allowing cross-origin requests directly from a browser. It's a public API intended for this kind of use and has worked in testing, but if you ever see prescription lookups silently doing nothing where you'd expect a match, that's the first thing to check (openFDA's status, or whether a lightweight proxy is needed).
+
+## App-like touch behaviour (v8.7)
+
+Double-tap-to-zoom is disabled — `touch-action:manipulation` on every element plus `maximum-scale=1.0, user-scalable=no` on the viewport meta tag. The CSS property is the one actually doing the work: modern Safari has scaled back how much it honours `user-scalable=no` on its own (Apple keeps pinch-zoom available regardless, for accessibility), but `touch-action:manipulation` reliably kills the double-tap gesture specifically without touching pinch-zoom, which iOS wouldn't let us fully disable anyway. This wasn't a regression — it was never actually set, just now fixed.
+
+## Known limitations
+
+
+- OCR quality depends on photo quality/lighting; always cross-check the original packaging for anything allergy-relevant — this is stated in-app too.
+- Open Food Facts is community-maintained; product data can be missing or incomplete.
+- Association/trend results are statistical patterns in your own diary, not a medical assessment, and don't control for multiple foods eaten the same day.
+- Single-device only — see Data & privacy above.
