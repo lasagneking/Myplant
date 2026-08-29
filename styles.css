@@ -67,14 +67,46 @@ html{touch-action:manipulation}
 body{
   margin:0;
   font-family:var(--font-body);
-  background:
-    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(var(--trace-rgb),.07), transparent 50%),
-    radial-gradient(ellipse 80% 50% at 100% 50%, rgba(var(--safe-rgb),.03), transparent 40%),
-    var(--bg);
+  background:var(--bg);
   color:var(--ink);
   -webkit-font-smoothing:antialiased;
   color-scheme:dark;
   min-height:100vh;
+  position:relative;
+}
+
+/* Ambient background shift — very slow amber ↔ teal drift at low opacity */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse 100% 70% at 30% 10%, rgba(var(--trace-rgb),.09), transparent 55%),
+    radial-gradient(ellipse 80% 60% at 90% 60%, rgba(var(--safe-rgb),.06), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 10% 80%, rgba(var(--trace-rgb),.04), transparent 45%),
+    var(--bg);
+  background-size:140% 140%, 130% 130%, 120% 120%, auto;
+  background-position:0% 0%, 100% 50%, 0% 100%, center;
+  animation:ambientShift 42s ease-in-out infinite alternate;
+}
+@keyframes ambientShift{
+  0%{
+    background-position:0% 0%, 100% 50%, 0% 100%, center;
+    opacity:1;
+  }
+  50%{
+    background-position:60% 30%, 40% 70%, 50% 40%, center;
+    opacity:1;
+  }
+  100%{
+    background-position:100% 20%, 0% 80%, 80% 10%, center;
+    opacity:1;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  body::before{animation:none}
 }
 
 /* Scrollbars hidden */
