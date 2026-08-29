@@ -662,7 +662,22 @@ textarea:focus,input:focus,select:focus{
   text-transform:uppercase;
   font-weight:600;
 }
-.view{display:none}.view.active{display:block}
+.view{
+  display:none;
+  opacity:0;
+  transform:translateY(10px);
+}
+.view.active{
+  display:block;
+  animation:viewCrossFade 0.32s var(--ease-out) both;
+}
+@keyframes viewCrossFade{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media (prefers-reduced-motion: reduce){
+  .view.active{animation:none;opacity:1;transform:none}
+}
 
 /* ========== WEEK / STATS / CALENDAR ========== */
 .week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:16px 0}
