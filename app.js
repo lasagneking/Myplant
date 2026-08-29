@@ -2,7 +2,7 @@
 const STORAGE_KEY = "intolearn_personal_v1";
 const PRODUCT_CACHE_KEY = "intolearn_product_cache_v1";
 const PRODUCT_CACHE_SCHEMA = 3;
-const APP_VERSION = "9.4";
+const APP_VERSION = "9.5";
 
 // Hand-sketched, single-stroke "field notebook" icon set — every icon uses
 // currentColor so it inherits ink/amber automatically on selected/active
@@ -2277,6 +2277,39 @@ function renderExit(){
   const complete=Object.keys(ex).length>0;
   document.getElementById("exitStatus").textContent=complete?"Saved":"Not completed";
   document.getElementById("summaryMood").innerHTML=moodIcon(ex.feeling);
+  updateCompletionRing();
+}
+
+// Daily completion ring: 4 meal types + Exit Interview = 5 equal parts.
+// Fills smoothly as the user logs food and completes the check-in.
+const RING_CIRCUMFERENCE = 2 * Math.PI * 30; // matches SVG r="30"
+function computeTodayProgress(){
+  const day = currentDay();
+  let filled = 0;
+  mealTypes.forEach(m=>{
+    if((day.meals?.[m.key]||[]).length > 0) filled += 1;
+  });
+  if(day.exit && Object.keys(day.exit).length > 0) filled += 1;
+  return filled / 5; // 0 → 1
+}
+function updateCompletionRing(){
+  const fill = document.getElementById("completionRingFill");
+  const wrap = document.getElementById("completionRingWrap");
+  if(!fill || !wrap) return;
+  const progress = computeTodayProgress();
+  const offset = RING_CIRCUMFERENCE * (1 - progress);
+  fill.style.strokeDasharray = String(RING_CIRCUMFERENCE);
+  fill.style.strokeDashoffset = String(offset);
+  const wasComplete = wrap.classList.contains("complete");
+  const isComplete = progress >= 1;
+  wrap.classList.toggle("complete", isComplete);
+  wrap.setAttribute("aria-valuenow", Math.round(progress * 100));
+  wrap.setAttribute("aria-valuemin", "0");
+  wrap.setAttribute("aria-valuemax", "100");
+  // Celebrate only when we newly hit 100%
+  if(isComplete && !wasComplete && progress >= 1){
+    haptic(10);
+  }
 }
 
 // --- Knowledge: reference cards for each allergen/intolerance category.
