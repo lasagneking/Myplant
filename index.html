@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Petit+Formal+Script&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" />
-  <link rel="stylesheet" href="styles.css?v=102" />
+  <link rel="stylesheet" href="styles.css?v=103" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Intolearn">
@@ -450,6 +450,24 @@
         </select>
         <div id="eatingOutChips" class="eating-out-chips"></div>
         <p class="eating-out-hint">Tap a trigger to cycle through: Unknown → Suspected → Confirmed → off. Leave untapped if it isn't relevant to this meal.</p>
+      </div>
+
+      <div class="eating-out-toggle-row">
+        <button type="button" class="kb-link" id="drinkToggleBtn">Logging a drink? Use quick presets instead</button>
+      </div>
+      <div id="drinkSection" class="eating-out-section hidden">
+        <label>Drink type</label>
+        <div class="choice-row choice-row-stack" data-choice="drinkType">
+          <button type="button" data-value="water">Water</button>
+          <button type="button" data-value="tea">Tea</button>
+          <button type="button" data-value="coffee">Coffee</button>
+          <button type="button" data-value="fizzy-regular">Fizzy drink (regular)</button>
+          <button type="button" data-value="fizzy-diet">Fizzy drink (diet / zero)</button>
+          <button type="button" data-value="alcohol">Alcoholic drink</button>
+        </div>
+        <label class="passport-toggle-label" id="drinkMilkRow" style="display:none"><input type="checkbox" id="drinkWithMilk"> With milk</label>
+        <div id="drinkChips" class="eating-out-chips"></div>
+        <p class="eating-out-hint">Common triggers are pre-filled based on the drink type — tap any chip to adjust (Unknown → Suspected → Confirmed → off).</p>
       </div>
 
       <label>Portion size</label>
@@ -896,7 +914,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
-  <script src="app.js?v=94"></script>
+  <script src="app.js?v=95"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

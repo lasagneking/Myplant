@@ -75,7 +75,8 @@ const ALLERGEN_ICONS={
   "Chilli":`<svg viewBox="0 0 24 24" ${SVG_BASE}><path d="M9 5.3c.9 0 1.7.4 2 1.2M9.2 6.7c-2.4 1-3.9 3.8-3.9 6.6a4.7 4.7 0 0 0 4.7 4.7c3.7 0 7.5-3.8 7.5-8.5 0-1.9-.9-3.3-2.3-3.8"/></svg>`,
   "Tomato":`<svg viewBox="0 0 24 24" ${SVG_BASE}><circle cx="12" cy="13.5" r="5.7"/><path d="M12 7.8c-.9-1.2-.9-2.1 0-3.1M12 7.8c.9-1.2.9-2.1 0-3.1M9.7 6.7c.9.3 1.6.8 2.3 1.5M14.3 6.7c-.9.3-1.6.8-2.3 1.5"/></svg>`,
   "Legumes / pulses":`<svg viewBox="0 0 24 24" ${SVG_BASE}><path d="M7.5 14.5c0-5 2-9 6-10.5"/><path d="M16.5 9c0 5-2 9-6 10.5"/><circle cx="10.3" cy="9.3" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="13" r=".9" fill="currentColor" stroke="none"/><circle cx="13.7" cy="16.7" r=".9" fill="currentColor" stroke="none"/></svg>`,
-  "Sweeteners":`<svg viewBox="0 0 24 24" ${SVG_BASE}><circle cx="7.4" cy="15.3" r="1.9"/><circle cx="16.6" cy="15.3" r="1.9"/><circle cx="12" cy="7.4" r="1.9"/><path d="M9.1 13.7 10.4 9.3M14.9 13.7 13.6 9.3M9.3 15.3h5.4"/></svg>`
+  "Sweeteners":`<svg viewBox="0 0 24 24" ${SVG_BASE}><circle cx="7.4" cy="15.3" r="1.9"/><circle cx="16.6" cy="15.3" r="1.9"/><circle cx="12" cy="7.4" r="1.9"/><path d="M9.1 13.7 10.4 9.3M14.9 13.7 13.6 9.3M9.3 15.3h5.4"/></svg>`,
+  "Caffeine":`<svg viewBox="0 0 24 24" ${SVG_BASE}><path d="M6 10h11v4.2A4.8 4.8 0 0 1 12.2 19H10A4.8 4.8 0 0 1 5.2 14.2V10Z"/><path d="M17 11h1.3a2.4 2.4 0 0 1 0 4.8H17"/><path d="M9 4.5c-.7.9-.7 1.6 0 2.5M12.3 4.5c-.7.9-.7 1.6 0 2.5"/></svg>`
 };
 function renderAllergenGridIcons(){
   document.querySelectorAll(".checker-trigger-grid button[data-trigger]").forEach(btn=>{
@@ -121,7 +122,12 @@ const ingredientFamilies = [
   {name:"Legumes / pulses", terms:["pea","peas","chickpea","chickpeas","lentil","lentils","bean","beans"]},
   {name:"Tomato", terms:["tomato","tomatoes","tomato paste","tomato purée","tomato puree"]},
   {name:"Chilli", terms:["chilli","chilis","chilli powder","chili","cayenne"]},
-  {name:"Sweeteners", terms:["sorbitol","mannitol","xylitol","maltitol","erythritol","isomalt"]}
+  // Broadened from sugar-alcohols-only: aspartame/acesulfame K/sucralose/
+  // saccharin are a different chemical class (intense sweeteners, not the
+  // polyols that cause an osmotic laxative effect) but most people think
+  // of "sweeteners" as one bucket, so they're tracked together here.
+  {name:"Sweeteners", terms:["sorbitol","mannitol","xylitol","maltitol","erythritol","isomalt","aspartame","acesulfame","acesulfame k","acesulfame potassium","sucralose","saccharin"]},
+  {name:"Caffeine", terms:["caffeine","guarana"]}
 ];
 
 
@@ -147,7 +153,8 @@ const checkerTriggerTerms = {
   "Chilli":["chilli","chili","cayenne","chilli powder"],
   "Tomato":["tomato","tomatoes","tomato paste","tomato puree","tomato purée"],
   "Legumes / pulses":["pea","peas","chickpea","chickpeas","lentil","lentils","bean","beans"],
-  "Sweeteners":["sorbitol","mannitol","xylitol","maltitol","erythritol","isomalt"]
+  "Sweeteners":["sorbitol","mannitol","xylitol","maltitol","erythritol","isomalt","aspartame","acesulfame","acesulfame k","acesulfame potassium","sucralose","saccharin"],
+  "Caffeine":["caffeine","guarana"]
 };
 
 function getSelectedCheckerTriggers(){
@@ -1179,6 +1186,7 @@ function renderMeals(){
                 <small>${[it.time, it.portionSize?it.portionSize+" portion":null, it.quantity||null, it.cookingMethod||null].filter(Boolean).join(" · ")}${it.notes ? " · "+escapeHtml(it.notes):""}</small>
                 <div class="ingredient-tags">${(it.ingredients||[]).slice(0,8).map(x=>`<span class="ingredient-tag">${escapeHtml(x)}</span>`).join("")}</div>
                 ${it.eatingOut?.cuisine ? `<div class="ingredient-tags"><span class="ingredient-tag">🍽 ${escapeHtml(it.eatingOut.cuisine)}</span>${Object.entries(it.eatingOut.triggers||{}).map(([cat,conf])=>`<span class="confidence-chip" data-confidence="${conf}" style="pointer-events:none;padding:4px 10px;font-size:11px">${escapeHtml(cat)} · ${CONFIDENCE_LABEL[conf]||conf}</span>`).join("")}</div>` : ""}
+                ${it.drink?.type ? `<div class="ingredient-tags"><span class="ingredient-tag">🥤 ${escapeHtml(DRINK_PRESETS[it.drink.type]?.label||it.drink.type)}</span>${Object.entries(it.drink.triggers||{}).map(([cat,conf])=>`<span class="confidence-chip" data-confidence="${conf}" style="pointer-events:none;padding:4px 10px;font-size:11px">${escapeHtml(cat)} · ${CONFIDENCE_LABEL[conf]||conf}</span>`).join("")}</div>` : ""}
               </div>
               <div class="entry-actions">
                 <button class="entry-action view-entry" type="button" data-meal="${m.key}" data-index="${i}">View / Edit</button>
@@ -1337,6 +1345,7 @@ function resetMealForm(){
   photoData="";
   mealBarcodeData=null;
   setEatingOutMode(false);
+  setDrinkMode(false);
   const barcodeNote=document.getElementById("mealBarcodeSource");
   if(barcodeNote){ barcodeNote.textContent=""; barcodeNote.classList.add("hidden"); }
 }
@@ -1392,6 +1401,17 @@ function openMeal(meal, index=null, entryDateKey=null){
       document.getElementById("eatingOutCuisine").value=item.eatingOut.cuisine;
       renderEatingOutChips();
     }
+    if(item.drink && item.drink.type){
+      setDrinkMode(true);
+      drinkState={type:item.drink.type, triggers:{...(item.drink.triggers||{})}};
+      document.querySelectorAll('[data-choice="drinkType"] button').forEach(b=>{
+        b.classList.toggle("selected", b.dataset.value===item.drink.type);
+      });
+      const showMilk=item.drink.type==="tea" || item.drink.type==="coffee";
+      document.getElementById("drinkMilkRow").style.display=showMilk ? "flex" : "none";
+      document.getElementById("drinkWithMilk").checked=(drinkState.triggers["Milk / dairy"]==="confirmed");
+      renderDrinkChips();
+    }
   }
   document.getElementById("mealDialog").showModal();
 }
@@ -1432,23 +1452,30 @@ function saveMeal(){
     showToast("Please choose a cuisine, or switch back to typed ingredients.");
     return;
   }
+  if(drinkState && !drinkState.type){
+    showToast("Please choose a drink type, or switch back to typed ingredients.");
+    return;
+  }
 
   // Only "Confirmed" triggers feed the existing allergens array that Trends
   // already pattern-matches against — Suspected/Unknown stay out of it for
   // now so a guess doesn't carry the same statistical weight as a certainty.
-  // The full confidence breakdown is still saved on entry.eatingOut for a
-  // dedicated Trends-weighting pass later.
-  const eatingOutAllergens=eatingOutState
-    ? Object.entries(eatingOutState.triggers).filter(([,c])=>c==="confirmed").map(([cat])=>cat)
-    : null;
+  // The full confidence breakdown is still saved on entry.eatingOut/entry.drink
+  // for the same Suspected/Unknown handling mealAnalysisTags already does.
+  function confirmedOnly(triggers){
+    return Object.entries(triggers).filter(([,c])=>c==="confirmed").map(([cat])=>cat);
+  }
 
   const entry={
     name,
     time:document.getElementById("foodTime").value,
-    ingredients:eatingOutState ? [] : parseIngredients(document.getElementById("ingredients").value),
-    families:eatingOutState ? [] : detectFamilies(document.getElementById("ingredients").value),
-    allergens:eatingOutState ? eatingOutAllergens : (mealBarcodeData ? (mealBarcodeData.allergens||[]) : detectUKAllergens(document.getElementById("ingredients").value)),
+    ingredients:(eatingOutState||drinkState) ? [] : parseIngredients(document.getElementById("ingredients").value),
+    families:(eatingOutState||drinkState) ? [] : detectFamilies(document.getElementById("ingredients").value),
+    allergens:eatingOutState ? confirmedOnly(eatingOutState.triggers)
+            : drinkState ? confirmedOnly(drinkState.triggers)
+            : (mealBarcodeData ? (mealBarcodeData.allergens||[]) : detectUKAllergens(document.getElementById("ingredients").value)),
     eatingOut:eatingOutState ? {cuisine:eatingOutState.cuisine, triggers:{...eatingOutState.triggers}} : undefined,
+    drink:drinkState ? {type:drinkState.type, triggers:{...drinkState.triggers}} : undefined,
     portionSize:document.querySelector('[data-choice="foodPortion"] button.selected')?.dataset.value || "Medium",
     quantity:document.getElementById("foodQuantity").value.trim(),
     cookingMethod:document.getElementById("foodCookingMethod").value,
@@ -1456,7 +1483,7 @@ function saveMeal(){
     photo:photoData,
     barcode:mealBarcodeData?.barcode||"",
     brand:mealBarcodeData?.brand||"",
-    source:eatingOutState ? "Eating out" : (mealBarcodeData ? "Open Food Facts" : "Manual/OCR"),
+    source:eatingOutState ? "Eating out" : drinkState ? "Drink" : (mealBarcodeData ? "Open Food Facts" : "Manual/OCR"),
     allergenSource:mealBarcodeData?.allergenSource||"",
     createdAt: editingIndex===null ? new Date().toISOString() : (getDay(editingDateKey).meals[activeMeal][editingIndex]?.createdAt || new Date().toISOString()),
     updatedAt:new Date().toISOString()
@@ -2857,6 +2884,7 @@ function setEatingOutMode(on){
   const toggleBtn=document.getElementById("eatingOutToggleBtn");
   if(!section || !ingredientsGroup) return;
   if(on){
+    setDrinkMode(false);
     if(!eatingOutState) eatingOutState={cuisine:"", triggers:{}};
     populateEatingOutCuisineSelect();
     renderEatingOutChips();
@@ -2879,6 +2907,88 @@ document.getElementById("eatingOutCuisine")?.addEventListener("change", e=>{
   eatingOutState.cuisine=e.target.value;
   eatingOutState.triggers={};
   renderEatingOutChips();
+});
+
+// --- Drink quick-log: for the "no barcode, no ingredient list" case that
+// covers most drinks (tap water, a coffee-machine coffee, a can from a
+// bottle). Presets pre-fill sensible starting confidence levels using the
+// same Off/Unknown/Suspected/Confirmed chips as Eating out — a coffee
+// almost always has caffeine (starts Confirmed), a generic "fizzy drink"
+// might or might not (starts Suspected), so the defaults are a starting
+// point to adjust, not a claim of certainty.
+let drinkState=null;
+const DRINK_RELEVANT_CATEGORIES=["Caffeine","Milk / dairy","Sweeteners","Sulphites"];
+const DRINK_PRESETS={
+  "water":{label:"Water", triggers:{}},
+  "tea":{label:"Tea", triggers:{"Caffeine":"suspected"}},
+  "coffee":{label:"Coffee", triggers:{"Caffeine":"confirmed"}},
+  "fizzy-regular":{label:"Fizzy drink (regular)", triggers:{"Caffeine":"suspected"}},
+  "fizzy-diet":{label:"Fizzy drink (diet / zero)", triggers:{"Caffeine":"suspected","Sweeteners":"suspected"}},
+  "alcohol":{label:"Alcoholic drink", triggers:{"Sulphites":"suspected"}}
+};
+
+function renderDrinkChips(){
+  const wrap=document.getElementById("drinkChips");
+  if(!wrap || !drinkState) return;
+  wrap.innerHTML=DRINK_RELEVANT_CATEGORIES.map(cat=>{
+    const conf=drinkState.triggers[cat] || "off";
+    const label=conf==="off" ? cat : `${cat} · ${CONFIDENCE_LABEL[conf]}`;
+    return `<button type="button" class="confidence-chip" data-category="${escapeHtml(cat)}" data-confidence="${conf}">${escapeHtml(label)}</button>`;
+  }).join("");
+  wrap.querySelectorAll(".confidence-chip").forEach(chip=>{
+    chip.addEventListener("click", ()=>{
+      const cat=chip.dataset.category;
+      const cur=drinkState.triggers[cat] || "off";
+      const next=CONFIDENCE_CYCLE[(CONFIDENCE_CYCLE.indexOf(cur)+1) % CONFIDENCE_CYCLE.length];
+      if(next==="off") delete drinkState.triggers[cat];
+      else drinkState.triggers[cat]=next;
+      renderDrinkChips();
+    });
+  });
+}
+
+function setDrinkMode(on){
+  const section=document.getElementById("drinkSection");
+  const ingredientsGroup=document.getElementById("ingredientsFieldGroup");
+  const toggleBtn=document.getElementById("drinkToggleBtn");
+  if(!section || !ingredientsGroup) return;
+  if(on){
+    setEatingOutMode(false);
+    if(!drinkState) drinkState={type:"", triggers:{}};
+    renderDrinkChips();
+    section.classList.remove("hidden");
+    ingredientsGroup.classList.add("hidden");
+    if(toggleBtn) toggleBtn.textContent="Use typed ingredients instead";
+  }else{
+    drinkState=null;
+    section.classList.add("hidden");
+    ingredientsGroup.classList.remove("hidden");
+    if(toggleBtn) toggleBtn.textContent="Logging a drink? Use quick presets instead";
+  }
+}
+
+document.getElementById("drinkToggleBtn")?.addEventListener("click", ()=>{
+  setDrinkMode(!drinkState);
+});
+document.querySelectorAll('[data-choice="drinkType"] button').forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    if(!drinkState) return;
+    drinkState.type=btn.dataset.value;
+    const preset=DRINK_PRESETS[btn.dataset.value];
+    drinkState.triggers={...(preset?.triggers||{})};
+    const milkRow=document.getElementById("drinkMilkRow");
+    const showMilk=btn.dataset.value==="tea" || btn.dataset.value==="coffee";
+    milkRow.style.display=showMilk ? "flex" : "none";
+    document.getElementById("drinkWithMilk").checked=false;
+    if(!showMilk) delete drinkState.triggers["Milk / dairy"];
+    renderDrinkChips();
+  });
+});
+document.getElementById("drinkWithMilk")?.addEventListener("change", e=>{
+  if(!drinkState) return;
+  if(e.target.checked) drinkState.triggers["Milk / dairy"]="confirmed";
+  else delete drinkState.triggers["Milk / dairy"];
+  renderDrinkChips();
 });
 
 // --- Passport: translated allergy cards for travel. Each language entry
@@ -3098,7 +3208,8 @@ registerPassportLanguage("Spanish", {
     "Chilli":"Chili",
     "Tomato":"Tomate",
     "Legumes / pulses":"Legumbres",
-    "Sweeteners":"Edulcorantes"
+    "Sweeteners":"Edulcorantes",
+    "Caffeine":"Cafeína"
   }
 });
 
@@ -3152,7 +3263,8 @@ registerPassportLanguage("Dutch", {
     "Chilli":"Chilipeper",
     "Tomato":"Tomaat",
     "Legumes / pulses":"Peulvruchten",
-    "Sweeteners":"Zoetstoffen"
+    "Sweeteners":"Zoetstoffen",
+    "Caffeine":"Cafeïne"
   }
 });
 
@@ -3812,6 +3924,11 @@ function mealAnalysisTags(x){
     if(conf==="suspected") tags.add(`${cat.toLowerCase()} (suspected - eating out)`);
     if(conf==="unknown") tags.add(`${cat.toLowerCase()} (unknown - eating out)`);
     // "confirmed" is already in x.allergens, merged in above — not repeated here.
+  });
+  if(x?.drink?.type) tags.add(`drink: ${x.drink.type.toLowerCase()}`);
+  Object.entries(x?.drink?.triggers||{}).forEach(([cat,conf])=>{
+    if(conf==="suspected") tags.add(`${cat.toLowerCase()} (suspected - drink)`);
+    if(conf==="unknown") tags.add(`${cat.toLowerCase()} (unknown - drink)`);
   });
   return [...tags];
 }
