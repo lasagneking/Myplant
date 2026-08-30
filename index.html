@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Petit+Formal+Script&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" />
-  <link rel="stylesheet" href="styles.css?v=99" />
+  <link rel="stylesheet" href="styles.css?v=100" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Intolearn">
@@ -200,9 +200,52 @@
         <div class="segmented-toggle" id="learnTabToggle">
           <button type="button" class="segmented-btn active" data-tab="allergens">Allergens</button>
           <button type="button" class="segmented-btn" data-tab="cuisines">Cuisines</button>
+          <button type="button" class="segmented-btn" data-tab="passport">Passport</button>
         </div>
         <div class="knowledge-grid" id="knowledgeGrid"></div>
         <div class="cuisine-grid hidden" id="cuisineGrid"></div>
+
+        <div id="passportView" class="passport-view hidden">
+          <div class="card">
+            <label>Language</label>
+            <select id="passportLanguage"></select>
+
+            <label>Who is this card for?</label>
+            <div class="choice-row choice-row-stack" data-choice="passportWho">
+              <button type="button" data-value="allergic">Myself — diagnosed allergy</button>
+              <button type="button" data-value="intolerance">Myself — suspected intolerance</button>
+              <button type="button" data-value="companion">A travel companion</button>
+            </div>
+
+            <div id="passportGenderRow" class="hidden">
+              <label>Gender (affects grammar in this language)</label>
+              <div class="choice-row" data-choice="passportGender">
+                <button type="button" data-value="male">Male</button>
+                <button type="button" data-value="female">Female</button>
+              </div>
+            </div>
+
+            <div id="passportSeverityRow" class="hidden">
+              <label>Severity</label>
+              <div class="choice-row choice-row-stack" data-choice="passportSeverity">
+                <button type="button" data-value="mild">Mild discomfort, not an emergency</button>
+                <button type="button" data-value="some">Some reaction — avoid this food</button>
+                <button type="button" data-value="severe">Severe allergy — avoid completely, including traces</button>
+                <button type="button" data-value="anaphylaxis">Anaphylaxis — no traces or cross-contamination</button>
+              </div>
+            </div>
+
+            <label>Which allergens should the card list?</label>
+            <div id="passportAllergenChips" class="eating-out-chips"></div>
+
+            <label class="passport-toggle-label"><input type="checkbox" id="passportIncludeEmergency" checked> Include emergency phrase</label>
+            <label class="passport-toggle-label"><input type="checkbox" id="passportIncludeDisclaimer" checked> Include translation disclaimer</label>
+
+            <button type="button" class="primary" id="generatePassportBtn" style="margin-top:16px">Generate card</button>
+          </div>
+
+          <div id="passportCardOutput"></div>
+        </div>
       </section>
 
       <dialog id="knowledgeDialog">
@@ -840,7 +883,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
-  <script src="app.js?v=90"></script>
+  <script src="app.js?v=91"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

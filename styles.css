@@ -1723,6 +1723,49 @@ dialog input,dialog textarea{margin-bottom:14px}
   background:var(--flag-soft);border-color:rgba(var(--flag-rgb),.6);color:var(--flag)
 }
 
+/* Passport */
+.passport-view{margin-top:16px}
+.passport-view label{margin-top:16px;display:block}
+.passport-view label:first-child{margin-top:0}
+.passport-toggle-label{
+  display:flex!important;align-items:center;gap:8px;
+  font-size:13px;color:var(--muted);margin-top:12px!important;
+}
+.passport-toggle-label input{width:auto;margin:0}
+.passport-card{
+  margin-top:20px;
+  background:var(--surface);
+  border:1.5px solid var(--trace);
+  border-radius:var(--radius-lg);
+  padding:22px;
+  box-shadow:var(--shadow-glow);
+}
+.passport-card-section{margin-bottom:18px}
+.passport-card-section:last-child{margin-bottom:0}
+.passport-card-section .eyebrow{margin-bottom:6px}
+.passport-card-line{
+  font-family:var(--font-body);font-size:16px;line-height:1.6;
+  color:var(--ink);margin:0 0 8px;
+}
+.passport-card-line:last-child{margin-bottom:0}
+.passport-allergen-list{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;
+}
+.passport-allergen-tag{
+  font-family:var(--font-body);font-size:14px;font-weight:600;
+  padding:6px 12px;border-radius:var(--radius-full);
+  background:var(--trace-soft);color:var(--trace);
+  border:1px solid rgba(var(--trace-rgb),.4);
+}
+.passport-emergency{
+  background:var(--flag-soft);border:1px solid rgba(var(--flag-rgb),.5);
+  border-radius:var(--radius);padding:14px 16px;
+  color:var(--flag);font-weight:600;font-size:16px;
+}
+.passport-disclaimer{
+  color:var(--muted);font-size:12px;font-style:italic;line-height:1.5;
+}
+
 /* Subtle entrance for cards on first paint */
 @media (prefers-reduced-motion: no-preference){
   .hero-card,.checker-launch-card,.meal-card,.card,.knowledge-tile,.report-panel{

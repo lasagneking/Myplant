@@ -2530,7 +2530,7 @@ document.getElementById("cuisineDialog").addEventListener("cancel", e=>{
   closeCuisineDialog();
 });
 
-// Allergens / Cuisines toggle in the Learn view
+// Allergens / Cuisines / Passport toggle in the Learn view
 document.querySelectorAll("#learnTabToggle .segmented-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     document.querySelectorAll("#learnTabToggle .segmented-btn").forEach(b=>b.classList.remove("active"));
@@ -2538,6 +2538,7 @@ document.querySelectorAll("#learnTabToggle .segmented-btn").forEach(btn=>{
     const tab=btn.dataset.tab;
     document.getElementById("knowledgeGrid").classList.toggle("hidden", tab!=="allergens");
     document.getElementById("cuisineGrid").classList.toggle("hidden", tab!=="cuisines");
+    document.getElementById("passportView").classList.toggle("hidden", tab!=="passport");
   });
 });
 
@@ -2879,6 +2880,231 @@ document.getElementById("eatingOutCuisine")?.addEventListener("change", e=>{
   eatingOutState.triggers={};
   renderEatingOutChips();
 });
+
+// --- Passport: translated allergy cards for travel. Each language entry
+// carries its own phrase bank, reviewed by a native speaker rather than
+// machine-translated — a new language is only added here once it's been
+// through that review, same as Spanish and Dutch were.
+let passportLanguages={};
+let passportSelectedAllergens=new Set();
+
+function registerPassportLanguage(name, phrases){
+  passportLanguages[name]=phrases;
+  populatePassportLanguageSelect();
+}
+
+function populatePassportLanguageSelect(){
+  const select=document.getElementById("passportLanguage");
+  if(!select) return;
+  const current=select.value;
+  const names=Object.keys(passportLanguages);
+  select.innerHTML=names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
+  if(names.includes(current)) select.value=current;
+}
+
+function currentPassportLanguage(){
+  const name=document.getElementById("passportLanguage")?.value;
+  return name ? passportLanguages[name] : null;
+}
+
+function updatePassportFormVisibility(){
+  const lang=currentPassportLanguage();
+  const who=document.querySelector('[data-choice="passportWho"] .selected')?.dataset.value;
+  document.getElementById("passportGenderRow").classList.toggle("hidden", !(who==="allergic" && lang?.hasGender));
+  document.getElementById("passportSeverityRow").classList.toggle("hidden", who!=="allergic");
+}
+
+function renderPassportAllergenChips(){
+  const wrap=document.getElementById("passportAllergenChips");
+  if(!wrap) return;
+  const names=Object.keys(ALLERGEN_ICONS);
+  wrap.innerHTML=names.map(name=>{
+    const on=passportSelectedAllergens.has(name);
+    return `<button type="button" class="confidence-chip" data-confidence="${on?"confirmed":"off"}" data-category="${escapeHtml(name)}">${escapeHtml(name)}</button>`;
+  }).join("");
+  wrap.querySelectorAll(".confidence-chip").forEach(chip=>{
+    chip.addEventListener("click", ()=>{
+      const cat=chip.dataset.category;
+      if(passportSelectedAllergens.has(cat)) passportSelectedAllergens.delete(cat);
+      else passportSelectedAllergens.add(cat);
+      renderPassportAllergenChips();
+    });
+  });
+}
+
+function initPassportForm(){
+  populatePassportLanguageSelect();
+  passportSelectedAllergens=new Set(state.profile?.allergies||[]);
+  renderPassportAllergenChips();
+  updatePassportFormVisibility();
+}
+
+document.getElementById("passportLanguage")?.addEventListener("change", updatePassportFormVisibility);
+document.querySelectorAll('[data-choice="passportWho"] button').forEach(btn=>{
+  btn.addEventListener("click", updatePassportFormVisibility);
+});
+
+function generatePassportCard(){
+  const lang=currentPassportLanguage();
+  const output=document.getElementById("passportCardOutput");
+  if(!lang || !output) return;
+
+  const who=document.querySelector('[data-choice="passportWho"] .selected')?.dataset.value;
+  if(!who){
+    showToast("Please choose who this card is for.");
+    return;
+  }
+
+  let gender=null, severity=null;
+  if(who==="allergic"){
+    if(lang.hasGender){
+      gender=document.querySelector('[data-choice="passportGender"] .selected')?.dataset.value;
+      if(!gender){
+        showToast("Please choose a gender — it changes the grammar in this language.");
+        return;
+      }
+    }
+    severity=document.querySelector('[data-choice="passportSeverity"] .selected')?.dataset.value;
+    if(!severity){
+      showToast("Please choose a severity level.");
+      return;
+    }
+  }
+
+  const includeEmergency=document.getElementById("passportIncludeEmergency").checked;
+  const includeDisclaimer=document.getElementById("passportIncludeDisclaimer").checked;
+
+  let statement;
+  if(who==="allergic") statement=lang.hasGender ? lang.statement.allergic[gender] : lang.statement.allergic;
+  else if(who==="intolerance") statement=lang.statement.intolerance;
+  else statement=lang.statement.companion;
+
+  const lines=[`<div class="passport-card-section"><div class="eyebrow">STATEMENT</div><p class="passport-card-line">${escapeHtml(statement)}</p></div>`];
+
+  if(who==="allergic"){
+    lines.push(`<div class="passport-card-section"><div class="eyebrow">SEVERITY</div><p class="passport-card-line">${escapeHtml(lang.severity[severity])}</p></div>`);
+  }
+
+  if(passportSelectedAllergens.size){
+    const names=[...passportSelectedAllergens].map(cat=>lang.allergenNames[cat]||cat);
+    lines.push(`<div class="passport-card-section"><div class="eyebrow">ALLERGENS TO AVOID</div><div class="passport-allergen-list">${names.map(n=>`<span class="passport-allergen-tag">${escapeHtml(n)}</span>`).join("")}</div></div>`);
+  }
+
+  lines.push(`<div class="passport-card-section"><div class="eyebrow">FOR THE KITCHEN</div>${lang.instructions.map(p=>`<p class="passport-card-line">${escapeHtml(p)}</p>`).join("")}</div>`);
+
+  if(includeEmergency){
+    lines.push(`<div class="passport-card-section"><div class="passport-emergency">${escapeHtml(lang.emergency)}</div></div>`);
+  }
+
+  if(includeDisclaimer){
+    lines.push(`<div class="passport-card-section"><p class="passport-disclaimer">${escapeHtml(lang.disclaimer)}</p></div>`);
+  }
+
+  output.innerHTML=`<div class="passport-card">${lines.join("")}</div>`;
+  output.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+document.getElementById("generatePassportBtn")?.addEventListener("click", generatePassportCard);
+
+registerPassportLanguage("Spanish", {
+  hasGender:true,
+  statement:{
+    allergic:{
+      male:"Soy alérgico a esta comida.",
+      female:"Soy alérgica a esta comida."
+    },
+    intolerance:"Evito esta comida porque sospecho una intolerancia alimenticia (no alergia diagnosticada).",
+    companion:"Mi acompañante tiene ciertas alergias alimenticias."
+  },
+  severity:{
+    mild:"Esta comida me causa una leve molestia, pero no es una emergencia médica.",
+    some:"Esto me causa cierta reacción. Eviten esta comida.",
+    severe:"Tengo alergia severa a esta comida. Evítenla por completo, trazas inclusive.",
+    anaphylaxis:"Esto puede causarme una reacción alérgica extrema (anafilaxis). Por favor asegúrense de que no hay trazas ni contaminación cruzada con este alimento."
+  },
+  instructions:[
+    "Eviten estos ingredientes.",
+    "Asegúrense de que no haya contaminación cruzada.",
+    "Incluso la más mínima traza puede causarme una reacción.",
+    "Por favor, asegúrense de que el chef comprueba cada ingrediente.",
+    "Si no están seguros, no lo incluyan en absoluto."
+  ],
+  emergency:"Emergencia médica. Llamen a emergencias inmediatamente.",
+  disclaimer:"He traducido esta tarjeta como guía. Ante la duda, consulten con alguien que hable inglés.",
+  allergenNames:{
+    "Cereals containing gluten":"Cereales con gluten",
+    "Wheat":"Trigo",
+    "Milk / dairy":"Productos lácteos",
+    "Lactose":"Lactosa",
+    "Egg":"Huevo",
+    "Soya":"Soja",
+    "Peanuts":"Cacahuetes",
+    "Tree nuts":"Frutos secos",
+    "Sesame":"Sésamo",
+    "Fish":"Pescado",
+    "Crustaceans":"Crustáceos",
+    "Molluscs":"Moluscos",
+    "Celery":"Apio",
+    "Mustard":"Mostaza",
+    "Sulphites":"Sulfitos",
+    "Lupin":"Altramuces",
+    "Onion":"Cebolla",
+    "Garlic":"Ajo",
+    "Chilli":"Chili",
+    "Tomato":"Tomate",
+    "Legumes / pulses":"Legumbres",
+    "Sweeteners":"Edulcorantes"
+  }
+});
+
+registerPassportLanguage("Dutch", {
+  hasGender:false,
+  statement:{
+    allergic:"Ik ben allergisch voor dit eten.",
+    intolerance:"Ik vermijd dit eten omdat ik mogelijk een intolerantie heb (geen gediagnosticeerde allergie).",
+    companion:"Mijn reisgenoot heeft bepaalde voedselallergieën."
+  },
+  severity:{
+    mild:"Dit eten veroorzaakt lichte klachten, maar het is geen medische noodsituatie.",
+    some:"Dit veroorzaakt een reactie bij mij. Vermijd dit eten.",
+    severe:"Ik heb een ernstige allergie voor dit eten. Vermijd het volledig, ook allergenen ervan.",
+    anaphylaxis:"Dit kan een extreme allergische reactie (anafylaxie) bij mij veroorzaken. Zorg ervoor dat er geen allergenen of kruisbesmetting in dit eten aanwezig is."
+  },
+  instructions:[
+    "Vermijd de volgende ingrediënten.",
+    "Controleer op kruisbesmetting in de keuken.",
+    "Zelfs een kleine hoeveelheid (allergenen) kan een reactie veroorzaken.",
+    "Vraag de chef-kok om de ingrediënten te bevestigen.",
+    "Bij twijfel: laat het weg."
+  ],
+  emergency:"Dit is een medisch noodgeval. Roep onmiddellijk hulp in.",
+  disclaimer:"Deze kaart is vertaald ter informatie. Controleer het bij twijfel rechtstreeks bij het personeel.",
+  allergenNames:{
+    "Cereals containing gluten":"Glutenhoudende granen",
+    "Wheat":"Tarwe",
+    "Milk / dairy":"Melk/zuivel",
+    "Lactose":"Lactose",
+    "Egg":"Ei",
+    "Soya":"Soja",
+    "Peanuts":"Pinda's",
+    "Tree nuts":"Noten",
+    "Sesame":"Sesam",
+    "Fish":"Vis",
+    "Crustaceans":"Schaaldieren",
+    "Molluscs":"Weekdieren",
+    "Celery":"Selderij",
+    "Mustard":"Mosterd",
+    "Sulphites":"Sulfieten",
+    "Lupin":"Lupine",
+    "Onion":"Ui",
+    "Garlic":"Knoflook",
+    "Chilli":"Chilipeper",
+    "Tomato":"Tomaat",
+    "Legumes / pulses":"Peulvruchten",
+    "Sweeteners":"Zoetstoffen"
+  }
+});
+
+initPassportForm();
 
 
 registerKnowledgeCards({
