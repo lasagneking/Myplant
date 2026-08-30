@@ -2946,7 +2946,7 @@ document.querySelectorAll('[data-choice="passportWho"] button').forEach(btn=>{
 
 function generatePassportCard(){
   const lang=currentPassportLanguage();
-  const output=document.getElementById("passportCardOutput");
+  const output=document.getElementById("passportCardBody");
   if(!lang || !output) return;
 
   const who=document.querySelector('[data-choice="passportWho"] .selected')?.dataset.value;
@@ -3000,10 +3000,36 @@ function generatePassportCard(){
     lines.push(`<div class="passport-card-section"><p class="passport-disclaimer">${escapeHtml(lang.disclaimer)}</p></div>`);
   }
 
-  output.innerHTML=`<div class="passport-card">${lines.join("")}</div>`;
-  output.scrollIntoView({behavior:"smooth", block:"nearest"});
+  output.innerHTML=lines.join("");
+  document.getElementById("passportCardLangTitle").textContent=document.getElementById("passportLanguage").value;
+
+  const dialog=document.getElementById("passportCardDialog");
+  dialog.showModal();
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>dialog.classList.add("show"));
+  });
 }
 document.getElementById("generatePassportBtn")?.addEventListener("click", generatePassportCard);
+
+function closePassportCardDialog(){
+  const d=document.getElementById("passportCardDialog");
+  if(!d || !d.open) return;
+  d.classList.remove("show");
+  let done=false;
+  const finish=()=>{
+    if(done) return;
+    done=true;
+    try{ if(d.open) d.close(); }catch(err){ console.warn("Dialog close failed",err); }
+  };
+  d.addEventListener("transitionend", finish, {once:true});
+  setTimeout(finish, 350);
+}
+document.getElementById("closePassportCardDialog")?.addEventListener("click", closePassportCardDialog);
+document.getElementById("editPassportAnswersBtn")?.addEventListener("click", closePassportCardDialog);
+document.getElementById("passportCardDialog")?.addEventListener("cancel", e=>{
+  e.preventDefault();
+  closePassportCardDialog();
+});
 
 registerPassportLanguage("Spanish", {
   hasGender:true,

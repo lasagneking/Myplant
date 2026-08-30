@@ -1766,6 +1766,60 @@ dialog input,dialog textarea{margin-bottom:14px}
   color:var(--muted);font-size:12px;font-style:italic;line-height:1.5;
 }
 
+/* Passport: full-screen presentation card — this is the screen someone
+   hands to a stranger under a bit of pressure, so it gets its own rules:
+   solid background rather than translucent glass (nothing useful to blur
+   behind a full-viewport surface, and flat contrast reads faster), no
+   rounded corners eating into edge space, and noticeably larger type
+   throughout than any other dialog in the app. */
+dialog.passport-fullscreen{
+  max-width:100vw;width:100vw;
+  max-height:100dvh;height:100dvh;
+  margin:0;padding:0;border:none;border-radius:0;
+  background:var(--bg);
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  display:flex;flex-direction:column;
+  opacity:0;transform:scale(.98);
+  transition:opacity .28s var(--ease-out), transform .28s var(--ease-out);
+}
+dialog.passport-fullscreen.show{opacity:1;transform:scale(1)}
+dialog.passport-fullscreen::backdrop{background:rgba(6,5,4,0);transition:background .3s ease}
+dialog.passport-fullscreen.show::backdrop{background:rgba(6,5,4,.92)}
+
+.passport-fullscreen-head{
+  flex-shrink:0;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:calc(20px + env(safe-area-inset-top)) 20px 16px;
+  border-bottom:1px solid var(--line-soft);
+}
+.passport-fullscreen-head h2{font-size:22px;margin:2px 0 0}
+.passport-fullscreen-scroll{
+  flex:1;overflow-y:auto;
+  padding:24px 22px;
+}
+.passport-fullscreen-foot{
+  flex-shrink:0;
+  padding:14px 20px calc(14px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line-soft);
+}
+.passport-fullscreen-foot button{width:100%}
+
+.passport-fullscreen-scroll .passport-card-section{margin-bottom:28px}
+.passport-fullscreen-scroll .eyebrow{font-size:13px;margin-bottom:10px}
+.passport-fullscreen-scroll .passport-card-line{
+  font-size:23px;line-height:1.55;font-weight:500;
+  margin:0 0 10px;
+}
+.passport-fullscreen-scroll .passport-allergen-list{gap:10px;margin-top:8px}
+.passport-fullscreen-scroll .passport-allergen-tag{
+  font-size:17px;padding:9px 16px;
+}
+.passport-fullscreen-scroll .passport-emergency{
+  font-size:20px;line-height:1.5;padding:18px 20px;
+  display:flex;align-items:center;gap:10px;
+}
+.passport-fullscreen-scroll .passport-disclaimer{font-size:13px}
+
 /* Subtle entrance for cards on first paint */
 @media (prefers-reduced-motion: no-preference){
   .hero-card,.checker-launch-card,.meal-card,.card,.knowledge-tile,.report-panel{
