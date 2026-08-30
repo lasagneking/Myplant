@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Petit+Formal+Script&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" />
-  <link rel="stylesheet" href="styles.css?v=98" />
+  <link rel="stylesheet" href="styles.css?v=99" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Intolearn">
@@ -379,8 +379,22 @@
       <label>Time</label>
       <input id="foodTime" type="time" />
 
-      <label>Ingredients</label>
-      <textarea id="ingredients" rows="4" placeholder="Type ingredients, one per line or comma separated"></textarea>
+      <div id="ingredientsFieldGroup">
+        <label>Ingredients</label>
+        <textarea id="ingredients" rows="4" placeholder="Type ingredients, one per line or comma separated"></textarea>
+      </div>
+
+      <div class="eating-out-toggle-row">
+        <button type="button" class="kb-link" id="eatingOutToggleBtn">Eating out? Log by cuisine instead</button>
+      </div>
+      <div id="eatingOutSection" class="eating-out-section hidden">
+        <label>Cuisine</label>
+        <select id="eatingOutCuisine">
+          <option value="">Select a cuisine…</option>
+        </select>
+        <div id="eatingOutChips" class="eating-out-chips"></div>
+        <p class="eating-out-hint">Tap a trigger to cycle through: Unknown → Suspected → Confirmed → off. Leave untapped if it isn't relevant to this meal.</p>
+      </div>
 
       <label>Portion size</label>
       <div class="choice-row" data-choice="foodPortion">
@@ -826,7 +840,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
-  <script src="app.js?v=88"></script>
+  <script src="app.js?v=89"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

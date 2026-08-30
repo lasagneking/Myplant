@@ -920,6 +920,10 @@ let barcodeDestination = "meal";
 let barcodeScannerRunning = false;
 let barcodeProduct = null;
 let mealBarcodeData = null;
+// Eating-out mode: { cuisine, triggers: { "Milk / dairy": "confirmed", ... } }
+// Confidence per tapped trigger, not per meal — lets Trends eventually weight
+// a guess differently from something the person actually confirmed.
+let eatingOutState = null;
 let toastTimer = null;
 let cropper = null;
 let pendingPhotoFile = null;
@@ -1174,6 +1178,7 @@ function renderMeals(){
                 <strong>${escapeHtml(it.name)}</strong>
                 <small>${[it.time, it.portionSize?it.portionSize+" portion":null, it.quantity||null, it.cookingMethod||null].filter(Boolean).join(" · ")}${it.notes ? " · "+escapeHtml(it.notes):""}</small>
                 <div class="ingredient-tags">${(it.ingredients||[]).slice(0,8).map(x=>`<span class="ingredient-tag">${escapeHtml(x)}</span>`).join("")}</div>
+                ${it.eatingOut?.cuisine ? `<div class="ingredient-tags"><span class="ingredient-tag">🍽 ${escapeHtml(it.eatingOut.cuisine)}</span>${Object.entries(it.eatingOut.triggers||{}).map(([cat,conf])=>`<span class="confidence-chip" data-confidence="${conf}" style="pointer-events:none;padding:4px 10px;font-size:11px">${escapeHtml(cat)} · ${CONFIDENCE_LABEL[conf]||conf}</span>`).join("")}</div>` : ""}
               </div>
               <div class="entry-actions">
                 <button class="entry-action view-entry" type="button" data-meal="${m.key}" data-index="${i}">View / Edit</button>
@@ -1331,6 +1336,7 @@ function resetMealForm(){
   document.getElementById("otherTrackingSection").classList.add("hidden");
   photoData="";
   mealBarcodeData=null;
+  setEatingOutMode(false);
   const barcodeNote=document.getElementById("mealBarcodeSource");
   if(barcodeNote){ barcodeNote.textContent=""; barcodeNote.classList.add("hidden"); }
 }
@@ -1380,6 +1386,12 @@ function openMeal(meal, index=null, entryDateKey=null){
       bn.classList.remove("hidden");
     }
     renderFamilies((item.ingredients||[]).join(" "));
+    if(item.eatingOut && item.eatingOut.cuisine){
+      setEatingOutMode(true);
+      eatingOutState={cuisine:item.eatingOut.cuisine, triggers:{...(item.eatingOut.triggers||{})}};
+      document.getElementById("eatingOutCuisine").value=item.eatingOut.cuisine;
+      renderEatingOutChips();
+    }
   }
   document.getElementById("mealDialog").showModal();
 }
@@ -1416,12 +1428,27 @@ function saveMeal(){
   }
   nameEl.classList.remove("field-error");
 
+  if(eatingOutState && !eatingOutState.cuisine){
+    showToast("Please choose a cuisine, or switch back to typed ingredients.");
+    return;
+  }
+
+  // Only "Confirmed" triggers feed the existing allergens array that Trends
+  // already pattern-matches against — Suspected/Unknown stay out of it for
+  // now so a guess doesn't carry the same statistical weight as a certainty.
+  // The full confidence breakdown is still saved on entry.eatingOut for a
+  // dedicated Trends-weighting pass later.
+  const eatingOutAllergens=eatingOutState
+    ? Object.entries(eatingOutState.triggers).filter(([,c])=>c==="confirmed").map(([cat])=>cat)
+    : null;
+
   const entry={
     name,
     time:document.getElementById("foodTime").value,
-    ingredients:parseIngredients(document.getElementById("ingredients").value),
-    families:detectFamilies(document.getElementById("ingredients").value),
-    allergens:mealBarcodeData ? (mealBarcodeData.allergens||[]) : detectUKAllergens(document.getElementById("ingredients").value),
+    ingredients:eatingOutState ? [] : parseIngredients(document.getElementById("ingredients").value),
+    families:eatingOutState ? [] : detectFamilies(document.getElementById("ingredients").value),
+    allergens:eatingOutState ? eatingOutAllergens : (mealBarcodeData ? (mealBarcodeData.allergens||[]) : detectUKAllergens(document.getElementById("ingredients").value)),
+    eatingOut:eatingOutState ? {cuisine:eatingOutState.cuisine, triggers:{...eatingOutState.triggers}} : undefined,
     portionSize:document.querySelector('[data-choice="foodPortion"] button.selected')?.dataset.value || "Medium",
     quantity:document.getElementById("foodQuantity").value.trim(),
     cookingMethod:document.getElementById("foodCookingMethod").value,
@@ -1429,7 +1456,7 @@ function saveMeal(){
     photo:photoData,
     barcode:mealBarcodeData?.barcode||"",
     brand:mealBarcodeData?.brand||"",
-    source:mealBarcodeData ? "Open Food Facts" : "Manual/OCR",
+    source:eatingOutState ? "Eating out" : (mealBarcodeData ? "Open Food Facts" : "Manual/OCR"),
     allergenSource:mealBarcodeData?.allergenSource||"",
     createdAt: editingIndex===null ? new Date().toISOString() : (getDay(editingDateKey).meals[activeMeal][editingIndex]?.createdAt || new Date().toISOString()),
     updatedAt:new Date().toISOString()
@@ -2784,8 +2811,76 @@ registerCuisineCards({
   }
 });
 
-// Working example, using the exact content already shared, so the system
-// is provable before the remaining 21 cards arrive.
+// --- Eating out: cuisine picker + per-trigger confidence chips.
+// Reuses the same cuisineCards data that powers the Learn cuisine dialogs,
+// so there's one source of truth for "what does this cuisine usually contain".
+const CONFIDENCE_CYCLE=["off","unknown","suspected","confirmed"];
+const CONFIDENCE_LABEL={unknown:"Unknown", suspected:"Suspected", confirmed:"Confirmed"};
+
+function populateEatingOutCuisineSelect(){
+  const select=document.getElementById("eatingOutCuisine");
+  if(!select) return;
+  const current=select.value;
+  const names=Object.keys(cuisineCards);
+  select.innerHTML=`<option value="">Select a cuisine…</option>` +
+    names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("");
+  if(names.includes(current)) select.value=current;
+}
+
+function renderEatingOutChips(){
+  const wrap=document.getElementById("eatingOutChips");
+  if(!wrap) return;
+  const cuisine=eatingOutState?.cuisine;
+  const card=cuisine ? cuisineCards[cuisine] : null;
+  if(!card){ wrap.innerHTML=""; return; }
+  wrap.innerHTML=(card.triggers||[]).map(t=>{
+    const conf=eatingOutState.triggers[t.category] || "off";
+    const label=conf==="off" ? t.category : `${t.category} · ${CONFIDENCE_LABEL[conf]}`;
+    return `<button type="button" class="confidence-chip" data-category="${escapeHtml(t.category)}" data-confidence="${conf}">${escapeHtml(label)}</button>`;
+  }).join("");
+  wrap.querySelectorAll(".confidence-chip").forEach(chip=>{
+    chip.addEventListener("click", ()=>{
+      const cat=chip.dataset.category;
+      const cur=eatingOutState.triggers[cat] || "off";
+      const next=CONFIDENCE_CYCLE[(CONFIDENCE_CYCLE.indexOf(cur)+1) % CONFIDENCE_CYCLE.length];
+      if(next==="off") delete eatingOutState.triggers[cat];
+      else eatingOutState.triggers[cat]=next;
+      renderEatingOutChips();
+    });
+  });
+}
+
+function setEatingOutMode(on){
+  const section=document.getElementById("eatingOutSection");
+  const ingredientsGroup=document.getElementById("ingredientsFieldGroup");
+  const toggleBtn=document.getElementById("eatingOutToggleBtn");
+  if(!section || !ingredientsGroup) return;
+  if(on){
+    if(!eatingOutState) eatingOutState={cuisine:"", triggers:{}};
+    populateEatingOutCuisineSelect();
+    renderEatingOutChips();
+    section.classList.remove("hidden");
+    ingredientsGroup.classList.add("hidden");
+    if(toggleBtn) toggleBtn.textContent="Use typed ingredients instead";
+  }else{
+    eatingOutState=null;
+    section.classList.add("hidden");
+    ingredientsGroup.classList.remove("hidden");
+    if(toggleBtn) toggleBtn.textContent="Eating out? Log by cuisine instead";
+  }
+}
+
+document.getElementById("eatingOutToggleBtn")?.addEventListener("click", ()=>{
+  setEatingOutMode(!eatingOutState);
+});
+document.getElementById("eatingOutCuisine")?.addEventListener("change", e=>{
+  if(!eatingOutState) return;
+  eatingOutState.cuisine=e.target.value;
+  eatingOutState.triggers={};
+  renderEatingOutChips();
+});
+
+
 registerKnowledgeCards({
   "Cereals containing gluten": {
     description:[

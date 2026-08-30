@@ -1690,6 +1690,39 @@ dialog input,dialog textarea{margin-bottom:14px}
 }
 .kb-link:active{opacity:.7}
 
+/* Eating out: cuisine + confidence-cycling trigger chips */
+.eating-out-toggle-row{margin-top:10px}
+.eating-out-section{
+  margin-top:14px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+}
+.eating-out-section select{margin-bottom:12px}
+.eating-out-chips{display:flex;flex-wrap:wrap;gap:8px}
+.eating-out-hint{
+  margin:12px 0 0;color:var(--muted);
+  font-size:12px;line-height:1.5;font-family:var(--font-body);
+}
+.confidence-chip{
+  font-family:var(--font-body);font-size:13px;font-weight:600;
+  padding:8px 14px;border-radius:var(--radius-full);
+  border:1.5px solid var(--line-strong);
+  background:transparent;color:var(--muted);
+  transition:background var(--duration) ease, color var(--duration) ease, border-color var(--duration) ease, transform var(--duration) var(--ease-out);
+}
+.confidence-chip:active{transform:scale(.96)}
+.confidence-chip[data-confidence="unknown"]{
+  border-style:dashed;border-color:var(--line-strong);color:var(--ink)
+}
+.confidence-chip[data-confidence="suspected"]{
+  background:var(--trace-soft);border-color:rgba(var(--trace-rgb),.5);color:var(--trace)
+}
+.confidence-chip[data-confidence="confirmed"]{
+  background:var(--flag-soft);border-color:rgba(var(--flag-rgb),.6);color:var(--flag)
+}
+
 /* Subtle entrance for cards on first paint */
 @media (prefers-reduced-motion: no-preference){
   .hero-card,.checker-launch-card,.meal-card,.card,.knowledge-tile,.report-panel{
