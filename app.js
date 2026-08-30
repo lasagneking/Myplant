@@ -2979,18 +2979,18 @@ function generatePassportCard(){
   else if(who==="intolerance") statement=lang.statement.intolerance;
   else statement=lang.statement.companion;
 
-  const lines=[`<div class="passport-card-section"><div class="eyebrow">STATEMENT</div><p class="passport-card-line">${escapeHtml(statement)}</p></div>`];
+  const lines=[`<div class="passport-card-section"><div class="eyebrow">${escapeHtml(lang.labels.statement)}</div><p class="passport-card-line">${escapeHtml(statement)}</p></div>`];
 
   if(who==="allergic"){
-    lines.push(`<div class="passport-card-section"><div class="eyebrow">SEVERITY</div><p class="passport-card-line">${escapeHtml(lang.severity[severity])}</p></div>`);
+    lines.push(`<div class="passport-card-section"><div class="eyebrow">${escapeHtml(lang.labels.severity)}</div><p class="passport-card-line">${escapeHtml(lang.severity[severity])}</p></div>`);
   }
 
   if(passportSelectedAllergens.size){
     const names=[...passportSelectedAllergens].map(cat=>lang.allergenNames[cat]||cat);
-    lines.push(`<div class="passport-card-section"><div class="eyebrow">ALLERGENS TO AVOID</div><div class="passport-allergen-list">${names.map(n=>`<span class="passport-allergen-tag">${escapeHtml(n)}</span>`).join("")}</div></div>`);
+    lines.push(`<div class="passport-card-section"><div class="eyebrow">${escapeHtml(lang.labels.allergens)}</div><div class="passport-allergen-list">${names.map(n=>`<span class="passport-allergen-tag">${escapeHtml(n)}</span>`).join("")}</div></div>`);
   }
 
-  lines.push(`<div class="passport-card-section"><div class="eyebrow">FOR THE KITCHEN</div>${lang.instructions.map(p=>`<p class="passport-card-line">${escapeHtml(p)}</p>`).join("")}</div>`);
+  lines.push(`<div class="passport-card-section"><div class="eyebrow">${escapeHtml(lang.labels.kitchen)}</div>${lang.instructions.map(p=>`<p class="passport-card-line">${escapeHtml(p)}</p>`).join("")}</div>`);
 
   if(includeEmergency){
     lines.push(`<div class="passport-card-section"><div class="passport-emergency">${escapeHtml(lang.emergency)}</div></div>`);
@@ -3007,6 +3007,12 @@ document.getElementById("generatePassportBtn")?.addEventListener("click", genera
 
 registerPassportLanguage("Spanish", {
   hasGender:true,
+  labels:{
+    statement:"DECLARACIÓN",
+    severity:"GRAVEDAD",
+    allergens:"ALÉRGENOS A EVITAR",
+    kitchen:"PARA LA COCINA"
+  },
   statement:{
     allergic:{
       male:"Soy alérgico a esta comida.",
@@ -3058,6 +3064,12 @@ registerPassportLanguage("Spanish", {
 
 registerPassportLanguage("Dutch", {
   hasGender:false,
+  labels:{
+    statement:"VERKLARING",
+    severity:"ERNSTNIVEAU",
+    allergens:"TE VERMIJDEN ALLERGENEN",
+    kitchen:"VOOR DE KEUKEN"
+  },
   statement:{
     allergic:"Ik ben allergisch voor dit eten.",
     intolerance:"Ik vermijd dit eten omdat ik mogelijk een intolerantie heb (geen gediagnosticeerde allergie).",
