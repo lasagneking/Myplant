@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,600&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Petit+Formal+Script&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" />
-  <link rel="stylesheet" href="styles.css?v=97" />
+  <link rel="stylesheet" href="styles.css?v=98" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Intolearn">
@@ -197,7 +197,12 @@
           <h1>Understand your triggers</h1>
           <p>Tap any category for what it is, key symptoms, and what to watch for.</p>
         </div>
+        <div class="segmented-toggle" id="learnTabToggle">
+          <button type="button" class="segmented-btn active" data-tab="allergens">Allergens</button>
+          <button type="button" class="segmented-btn" data-tab="cuisines">Cuisines</button>
+        </div>
         <div class="knowledge-grid" id="knowledgeGrid"></div>
+        <div class="cuisine-grid hidden" id="cuisineGrid"></div>
       </section>
 
       <dialog id="knowledgeDialog">
@@ -210,6 +215,22 @@
             <button type="button" class="icon-button" id="closeKnowledgeDialog" aria-label="Close">✕</button>
           </div>
           <div id="knowledgeCardBody"></div>
+        </div>
+      </dialog>
+
+      <dialog id="cuisineDialog">
+        <div class="crop-shell knowledge-shell cuisine-shell">
+          <div class="dialog-head">
+            <div class="knowledge-title-row">
+              <img id="cuisineCardImage" class="cuisine-hero-img" alt="">
+              <div>
+                <div class="eyebrow">CUISINE OVERVIEW</div>
+                <h2 id="cuisineCardTitle">Continent</h2>
+              </div>
+            </div>
+            <button type="button" class="icon-button" id="closeCuisineDialog" aria-label="Close">✕</button>
+          </div>
+          <div id="cuisineCardBody"></div>
         </div>
       </dialog>
 
@@ -805,7 +826,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
-  <script src="app.js?v=86"></script>
+  <script src="app.js?v=87"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

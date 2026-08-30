@@ -1,7 +1,7 @@
 // Intolearn service worker
 // Bump CACHE_VERSION whenever app.js/styles.css/index.html change so the
 // new files actually get picked up instead of being served stale forever.
-const CACHE_VERSION = "intolearn-v52";
+const CACHE_VERSION = "intolearn-v53";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -16,7 +16,17 @@ const APP_SHELL_URLS = [
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
-  "./apple-touch-icon.png"
+  "./apple-touch-icon.png",
+  "./cuisine-images/east-asian.png",
+  "./cuisine-images/south-asian.png",
+  "./cuisine-images/south-east-asian.png",
+  "./cuisine-images/mediterranean.png",
+  "./cuisine-images/south-american.png",
+  "./cuisine-images/west-africa.png",
+  "./cuisine-images/north-africa.png",
+  "./cuisine-images/east-africa.png",
+  "./cuisine-images/southern-africa.png",
+  "./cuisine-images/central-africa.png"
 ];
 
 // Third-party libraries loaded from jsdelivr, plus the Google Fonts
