@@ -3514,13 +3514,30 @@ function reportDateKeys(days){
     const d=new Date(k+"T12:00:00"); return d>=start && d<=end;
   }).sort();
 }
-function reportMealIngredients(x){
+// Shared by Report, Trends and confounded-pairs detection so all three
+// analyse the same signal from a meal entry, rather than each redoing its
+// own (previously inconsistent) subset. Confirmed data — barcode/typed
+// allergens, families, eating-out triggers tapped to "Confirmed" — is
+// merged into ordinary tags. Suspected/Unknown eating-out triggers get
+// their own distinctly-labelled tags instead of being merged in: a guess
+// can still surface as its own pattern if it repeats often enough, but it
+// can never inflate or be mistaken for a confirmed-trigger statistic.
+function mealAnalysisTags(x){
   const raw=(x?.ingredients||[]).join(" ");
-  return [...new Set([
+  const tags=new Set([
     ...(x?.allergens||[]),...(x?.families||[]),
-    ...detectUKAllergens(raw),...detectFamilies(raw)
-  ].filter(Boolean).map(v=>String(v).trim()))];
+    ...detectUKAllergens(raw),...detectFamilies(raw),
+    ...(x?.ingredients||[])
+  ].filter(Boolean).map(v=>String(v).trim().toLowerCase()));
+  if(x?.eatingOut?.cuisine) tags.add(`cuisine: ${x.eatingOut.cuisine.toLowerCase()}`);
+  Object.entries(x?.eatingOut?.triggers||{}).forEach(([cat,conf])=>{
+    if(conf==="suspected") tags.add(`${cat.toLowerCase()} (suspected - eating out)`);
+    if(conf==="unknown") tags.add(`${cat.toLowerCase()} (unknown - eating out)`);
+    // "confirmed" is already in x.allergens, merged in above — not repeated here.
+  });
+  return [...tags];
 }
+function reportMealIngredients(x){ return mealAnalysisTags(x); }
 function buildKnownSuspects(keys){
   const keySet=new Set(keys);
   const stats={};
@@ -3661,7 +3678,7 @@ function buildDayTagMap(){
   Object.entries(state.days||{}).forEach(([k,day])=>{
     const tags=new Set();
     mealTypes.forEach(m=>(day.meals?.[m.key]||[]).forEach(x=>{
-      (x.ingredients||[]).forEach(i=>tags.add(i.toLowerCase()));
+      mealAnalysisTags(x).forEach(t=>tags.add(t));
     }));
     (day.supplements||[]).forEach(s=>{ if(s.name) tags.add(s.name.trim().toLowerCase()); });
     tags.forEach(t=>{
@@ -3744,7 +3761,7 @@ function renderTrends(){
   const {ranked, baseline, consideredDays}=buildAssociationStats(allKeys, day=>{
     const ingredients=new Set();
     mealTypes.forEach(m=>(day.meals?.[m.key]||[]).forEach(x=>{
-      (x.ingredients||[]).forEach(i=>ingredients.add(i.toLowerCase()));
+      mealAnalysisTags(x).forEach(t=>ingredients.add(t));
       if(x.portionSize==="Large") ingredients.add("large portion");
       if(x.cookingMethod) ingredients.add("cooking: "+x.cookingMethod.toLowerCase());
     }));
