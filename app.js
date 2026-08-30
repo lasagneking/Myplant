@@ -2888,6 +2888,13 @@ document.getElementById("eatingOutCuisine")?.addEventListener("change", e=>{
 let passportLanguages={};
 let passportSelectedAllergens=new Set();
 
+// Matches the exact naming convention given to Lee for sourcing the 22
+// allergen photos — lowercase, "/" collapsed to a single hyphen, spaces to
+// hyphens. e.g. "Milk / dairy" -> "milk-dairy", "Tree nuts" -> "tree-nuts".
+function allergenImageSlug(category){
+  return category.toLowerCase().replace(/\s*\/\s*/g,"-").replace(/\s+/g,"-");
+}
+
 function registerPassportLanguage(name, phrases){
   passportLanguages[name]=phrases;
   populatePassportLanguageSelect();
@@ -2986,8 +2993,15 @@ function generatePassportCard(){
   }
 
   if(passportSelectedAllergens.size){
-    const names=[...passportSelectedAllergens].map(cat=>lang.allergenNames[cat]||cat);
-    lines.push(`<div class="passport-card-section"><div class="eyebrow">${escapeHtml(lang.labels.allergens)}</div><div class="passport-allergen-list">${names.map(n=>`<span class="passport-allergen-tag">${escapeHtml(n)}</span>`).join("")}</div></div>`);
+    const items=[...passportSelectedAllergens].map(cat=>({
+      label:lang.allergenNames[cat]||cat,
+      slug:allergenImageSlug(cat)
+    }));
+    lines.push(`<div class="passport-card-section"><div class="eyebrow">${escapeHtml(lang.labels.allergens)}</div><div class="passport-allergen-list">${items.map(it=>`
+      <div class="passport-allergen-photo-tag">
+        <img src="allergen-images/${it.slug}.png" alt="" class="passport-allergen-photo" onerror="this.style.display='none'">
+        <span class="passport-allergen-tag">${escapeHtml(it.label)}</span>
+      </div>`).join("")}</div></div>`);
   }
 
   lines.push(`<div class="passport-card-section"><div class="eyebrow">${escapeHtml(lang.labels.kitchen)}</div>${lang.instructions.map(p=>`<p class="passport-card-line">${escapeHtml(p)}</p>`).join("")}</div>`);

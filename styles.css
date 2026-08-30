@@ -1749,13 +1749,24 @@ dialog input,dialog textarea{margin-bottom:14px}
 }
 .passport-card-line:last-child{margin-bottom:0}
 .passport-allergen-list{
-  display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;
+  display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;
+}
+.passport-allergen-photo-tag{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:84px;
+}
+.passport-allergen-photo{
+  width:64px;height:64px;object-fit:contain;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:4px;
 }
 .passport-allergen-tag{
-  font-family:var(--font-body);font-size:14px;font-weight:600;
-  padding:6px 12px;border-radius:var(--radius-full);
+  font-family:var(--font-body);font-size:12px;font-weight:600;
+  padding:5px 10px;border-radius:var(--radius-full);
   background:var(--trace-soft);color:var(--trace);
   border:1px solid rgba(var(--trace-rgb),.4);
+  text-align:center;
 }
 .passport-emergency{
   background:var(--flag-soft);border:1px solid rgba(var(--flag-rgb),.5);
@@ -1810,9 +1821,11 @@ dialog.passport-fullscreen.show::backdrop{background:rgba(6,5,4,.92)}
   font-size:23px;line-height:1.55;font-weight:500;
   margin:0 0 10px;
 }
-.passport-fullscreen-scroll .passport-allergen-list{gap:10px;margin-top:8px}
+.passport-fullscreen-scroll .passport-allergen-list{gap:16px;margin-top:10px}
+.passport-fullscreen-scroll .passport-allergen-photo-tag{width:100px}
+.passport-fullscreen-scroll .passport-allergen-photo{width:80px;height:80px;padding:6px}
 .passport-fullscreen-scroll .passport-allergen-tag{
-  font-size:17px;padding:9px 16px;
+  font-size:14px;padding:6px 12px;
 }
 .passport-fullscreen-scroll .passport-emergency{
   font-size:20px;line-height:1.5;padding:18px 20px;
