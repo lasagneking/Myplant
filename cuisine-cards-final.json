@@ -1,0 +1,718 @@
+[
+  {
+    "continent": "East Asian",
+    "overview": {
+      "para1": "East Asian cuisine covers a diverse range of food traditions from China, Korea, Japan and surrounding regions. Rice, noodles, vegetables, seafood, fermented foods and broths are common, with dishes often built around fresh ingredients and carefully balanced flavours.",
+      "para2": "Many dishes are naturally based around rice, vegetables and fresh proteins, which can make some meals easier to adapt. However, sauces, marinades, dumplings and processed ingredients can introduce several common allergens, so the preparation of a dish is often just as important as its main ingredients."
+    },
+    "triggers": [
+      {
+        "category": "Soya",
+        "examples": "Soy sauce, tofu, miso, tempeh, edamame"
+      },
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Soy sauce, wheat noodles, dumpling wrappers, marinades"
+      },
+      {
+        "category": "Sesame",
+        "examples": "Sesame oil, sesame seeds, sesame-based sauces"
+      },
+      {
+        "category": "Fish",
+        "examples": "Fish sauce, dried fish, fish-based broths"
+      },
+      {
+        "category": "Crustaceans",
+        "examples": "Prawns, shrimp paste, dried shrimp"
+      },
+      {
+        "category": "Molluscs",
+        "examples": "Oysters, squid, mussels in soups and stir-fries"
+      },
+      {
+        "category": "Egg",
+        "examples": "Egg noodles, fried rice, omelettes, dumplings"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain steamed rice",
+        "caveat": "check if seasoned"
+      },
+      {
+        "item": "Plain steamed vegetables",
+        "caveat": "ask for no sauce or sesame oil"
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      },
+      {
+        "item": "Plain grilled meat",
+        "caveat": "no marinade or sauce"
+      },
+      {
+        "item": "Plain rice noodles",
+        "caveat": "check ingredients"
+      },
+      {
+        "item": "Clear vegetable broth",
+        "caveat": "check for soy, fish, shellfish"
+      }
+    ],
+    "closingTip": "Ask what's in the sauce, marinade and broth — that's where most hidden triggers appear."
+  },
+  {
+    "continent": "South Asian",
+    "overview": {
+      "para1": "South Asian cuisine spans a wide range of traditions including those of Bangladesh, India, Pakistan, Sri Lanka and neighbouring regions. Rice, wheat, lentils, vegetables, spices, yoghurt, eggs, fish and meat all feature prominently.",
+      "para2": "The large number of naturally plant-based dishes can make South Asian food surprisingly adaptable. The main challenge is that sauces, breads, spice blends and fried foods can contain several triggers at once, while dairy and wheat are particularly common in certain dishes."
+    },
+    "triggers": [
+      {
+        "category": "Milk / dairy",
+        "examples": "Yoghurt, ghee, cream, paneer, milk-based desserts"
+      },
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Roti, naan, chapati, paratha, samosas"
+      },
+      {
+        "category": "Peanuts",
+        "examples": "Peanuts, peanut-based sauces and garnishes"
+      },
+      {
+        "category": "Tree nuts",
+        "examples": "Cashews, almonds in sauces and desserts"
+      },
+      {
+        "category": "Sesame",
+        "examples": "Sesame seeds in chutneys and some breads"
+      },
+      {
+        "category": "Legumes / pulses",
+        "examples": "Lentils, chickpeas, peas, beans"
+      },
+      {
+        "category": "Chilli",
+        "examples": "Fresh and dried chilli in curries and chutneys"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain basmati rice",
+        "caveat": ""
+      },
+      {
+        "item": "Plain vegetable curry",
+        "caveat": "check for dairy, nuts, sesame"
+      },
+      {
+        "item": "Tandoori grilled meat",
+        "caveat": "check the marinade"
+      },
+      {
+        "item": "Plain poppadom",
+        "caveat": "ingredients vary, check first"
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      },
+      {
+        "item": "Plain lentil dish",
+        "caveat": "may contain onion, garlic, chilli"
+      }
+    ],
+    "closingTip": "Ask whether a curry contains cream, yoghurt, ghee or nuts, and check breads separately — a simple-looking dish can hide several triggers in its sauce."
+  },
+  {
+    "continent": "South East Asian",
+    "overview": {
+      "para1": "South East Asian cuisine brings together the food traditions of countries including Thailand, Vietnam, Malaysia, Indonesia and the Philippines. Rice, noodles, fresh herbs, vegetables, seafood, tropical fruit and intensely flavoured sauces are central to many dishes.",
+      "para2": "Fresh ingredients and rice-based dishes can provide relatively simple options, but sauces and pastes are important to watch. Soy, fish, shellfish, peanuts, wheat and chilli can appear together in a single meal, particularly in restaurant cooking."
+    },
+    "triggers": [
+      {
+        "category": "Soya",
+        "examples": "Soy sauce, tofu, fermented soy, marinades"
+      },
+      {
+        "category": "Fish",
+        "examples": "Fish sauce, dried fish, fish paste"
+      },
+      {
+        "category": "Crustaceans",
+        "examples": "Prawns, shrimp paste, dried shrimp"
+      },
+      {
+        "category": "Peanuts",
+        "examples": "Peanut sauce, satay, crushed peanuts"
+      },
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Wheat noodles, soy sauce, spring-roll wrappers"
+      },
+      {
+        "category": "Sesame",
+        "examples": "Sesame seeds and sesame oil as toppings"
+      },
+      {
+        "category": "Chilli",
+        "examples": "Fresh chilli, dried chilli, chilli paste"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain steamed rice",
+        "caveat": ""
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      },
+      {
+        "item": "Plain steamed vegetables",
+        "caveat": "no sauce or sesame oil"
+      },
+      {
+        "item": "Plain grilled fish",
+        "caveat": "no marinade or fish sauce"
+      },
+      {
+        "item": "Plain rice noodles",
+        "caveat": "check the broth"
+      },
+      {
+        "item": "Simple rice-paper rolls",
+        "caveat": "check fillings and dipping sauce"
+      }
+    ],
+    "closingTip": "The dipping sauce can matter more than the dish itself — always ask what's in sauces, pastes and marinades."
+  },
+  {
+    "continent": "Mediterranean",
+    "overview": {
+      "para1": "Mediterranean cuisine covers the diverse food traditions surrounding the Mediterranean Sea, including Southern Europe, the Middle East and North Africa. Fresh vegetables, fruit, grains, legumes, herbs, olive oil, fish and meat feature heavily.",
+      "para2": "Many Mediterranean meals are built from simple ingredients served separately, which can make them easier to adapt. However, wheat, dairy, fish, shellfish, sesame, mustard and sulphites can occur in breads, cheeses, sauces, preserved foods and restaurant dishes."
+    },
+    "triggers": [
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Bread, pasta, couscous, pastries, pizza"
+      },
+      {
+        "category": "Milk / dairy",
+        "examples": "Cheese, yoghurt, cream, dairy-based sauces"
+      },
+      {
+        "category": "Fish",
+        "examples": "Fresh and preserved fish dishes"
+      },
+      {
+        "category": "Crustaceans",
+        "examples": "Prawns and shrimp in seafood dishes"
+      },
+      {
+        "category": "Sesame",
+        "examples": "Tahini, sesame seeds, sesame-based sauces"
+      },
+      {
+        "category": "Mustard",
+        "examples": "Dressings, sauces, marinades"
+      },
+      {
+        "category": "Sulphites",
+        "examples": "Wine, dried fruit, preserved foods"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain grilled vegetables",
+        "caveat": "no sauce or cheese"
+      },
+      {
+        "item": "Plain grilled meat",
+        "caveat": "check marinade for mustard, dairy"
+      },
+      {
+        "item": "Plain rice",
+        "caveat": ""
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      },
+      {
+        "item": "Plain baked potato",
+        "caveat": "check toppings"
+      },
+      {
+        "item": "Simple salad",
+        "caveat": "dressing on the side"
+      }
+    ],
+    "closingTip": "Mediterranean menus often let you control ingredients individually — ordering grilled foods with sides on the side makes it easier to avoid specific triggers."
+  },
+  {
+    "continent": "South American",
+    "overview": {
+      "para1": "South American cuisine reflects the food traditions of a vast continent, combining Indigenous ingredients with European, African and Asian influences. Corn, rice, potatoes, beans, fresh vegetables, fruit, meat and seafood are important across many regions.",
+      "para2": "Many traditional meals are centred around naturally simple ingredients such as rice, corn, potatoes and grilled meats. Wheat, dairy, peanuts, seafood and onion can become more important in breads, pastries, sauces and regional specialities."
+    },
+    "triggers": [
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Bread, pastries, pasta, empanada dough"
+      },
+      {
+        "category": "Milk / dairy",
+        "examples": "Cheese, milk, cream, dairy desserts"
+      },
+      {
+        "category": "Peanuts",
+        "examples": "Peanuts in sauces and sweets in some regions"
+      },
+      {
+        "category": "Fish",
+        "examples": "Fresh fish and ceviche"
+      },
+      {
+        "category": "Crustaceans",
+        "examples": "Prawns and shrimp in coastal dishes"
+      },
+      {
+        "category": "Onion",
+        "examples": "Raw and cooked onion in sauces, stews, ceviche"
+      },
+      {
+        "category": "Chilli",
+        "examples": "Fresh and dried chilli in sauces"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain rice",
+        "caveat": ""
+      },
+      {
+        "item": "Plain grilled meat",
+        "caveat": "no marinade or sauce"
+      },
+      {
+        "item": "Plain baked potato",
+        "caveat": "check toppings"
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      },
+      {
+        "item": "Plain corn-based food",
+        "caveat": "check fillings"
+      },
+      {
+        "item": "Simple salad",
+        "caveat": "dressing on the side"
+      }
+    ],
+    "closingTip": "Look for meals built around one or two simple ingredients rather than heavily sauced dishes — recipes vary a lot by country, so always check preparation."
+  },
+  {
+    "continent": "West Africa",
+    "overview": {
+      "para1": "West African cuisine includes the diverse food traditions of countries such as Ghana, Nigeria, Senegal and Côte d'Ivoire. Rice, cassava, plantain, yams, beans, vegetables, fish and meat form the foundation of many dishes, with aromatic sauces and stews providing much of the flavour.",
+      "para2": "Many traditional dishes use naturally simple staples, particularly rice, root vegetables and plantain. Peanuts, fish, shellfish, tomato, onion, garlic and chilli are nevertheless common in sauces and stews, making the accompanying sauce especially important to check."
+    },
+    "triggers": [
+      {
+        "category": "Peanuts",
+        "examples": "Peanut stews, sauces, groundnut dishes"
+      },
+      {
+        "category": "Fish",
+        "examples": "Fresh, dried and smoked fish"
+      },
+      {
+        "category": "Crustaceans",
+        "examples": "Prawns and shrimp in coastal soups"
+      },
+      {
+        "category": "Tomato",
+        "examples": "Tomato-based sauces, stews, rice dishes"
+      },
+      {
+        "category": "Onion",
+        "examples": "A common base for stews and sauces"
+      },
+      {
+        "category": "Garlic",
+        "examples": "Used with onion in marinades and sauces"
+      },
+      {
+        "category": "Chilli",
+        "examples": "Fresh and dried chilli for heat and flavour"
+      },
+      {
+        "category": "Milk / dairy",
+        "examples": "Less central, but appears in drinks and desserts"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain boiled rice",
+        "caveat": ""
+      },
+      {
+        "item": "Plain boiled plantain",
+        "caveat": ""
+      },
+      {
+        "item": "Plain boiled yam",
+        "caveat": "check sauce served alongside"
+      },
+      {
+        "item": "Plain grilled meat",
+        "caveat": "ask about the marinade"
+      },
+      {
+        "item": "Plain vegetables",
+        "caveat": "no sauce or stew"
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      }
+    ],
+    "closingTip": "The staple and the sauce are usually separate — asking for the plain staple without the stew makes choosing much easier if you have several triggers."
+  },
+  {
+    "continent": "North Africa",
+    "overview": {
+      "para1": "North African cuisine includes the rich food traditions of Morocco, Algeria, Tunisia, Libya and Egypt. Grains, vegetables, legumes, fruit, meat, fish and aromatic herbs and spices are used extensively, with dishes often built around slow-cooked stews, breads and couscous.",
+      "para2": "Simple grilled meats, vegetables and rice-based dishes can be relatively easy to adapt, but wheat, dairy, sesame, nuts, fish and sulphites can occur in breads, sauces, preserved foods and desserts."
+    },
+    "triggers": [
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Couscous, breads, pastries, flatbreads"
+      },
+      {
+        "category": "Milk / dairy",
+        "examples": "Yoghurt, cheese, butter, desserts"
+      },
+      {
+        "category": "Tree nuts",
+        "examples": "Almonds in tagines, couscous, pastries"
+      },
+      {
+        "category": "Sesame",
+        "examples": "Sesame seeds in breads and sweets"
+      },
+      {
+        "category": "Fish",
+        "examples": "Common in coastal North African cooking"
+      },
+      {
+        "category": "Sulphites",
+        "examples": "Dried fruit and preserved ingredients"
+      },
+      {
+        "category": "Chilli",
+        "examples": "Chilli and chilli pastes"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain rice",
+        "caveat": ""
+      },
+      {
+        "item": "Plain grilled meat",
+        "caveat": "check the marinade and spice blend"
+      },
+      {
+        "item": "Plain grilled vegetables",
+        "caveat": "no sauce or butter"
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      },
+      {
+        "item": "Plain baked potato",
+        "caveat": "check toppings"
+      },
+      {
+        "item": "Simple vegetable stew",
+        "caveat": "check the base for onion, garlic, chilli"
+      }
+    ],
+    "closingTip": "Couscous is wheat-based, not a rice substitute — if gluten or wheat is a concern, ask what grain has actually been used."
+  },
+  {
+    "continent": "East Africa",
+    "overview": {
+      "para1": "East African cuisine brings together food traditions from countries including Ethiopia, Kenya, Tanzania, Uganda and surrounding regions. Grains, maize, rice, legumes, vegetables, meat, fish and aromatic spices feature prominently, with considerable variation between countries.",
+      "para2": "Many meals are built around naturally simple staples such as rice, maize, potatoes and vegetables. However, wheat, milk, legumes, sesame, fish, onion, garlic and chilli can appear frequently depending on the regional dish."
+    },
+    "triggers": [
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Chapati, breads, pastries, snacks"
+      },
+      {
+        "category": "Milk / dairy",
+        "examples": "Milk, yoghurt, butter, dairy drinks"
+      },
+      {
+        "category": "Legumes / pulses",
+        "examples": "Lentils, beans, peas in many dishes"
+      },
+      {
+        "category": "Sesame",
+        "examples": "Seeds and sesame-based ingredients in some breads"
+      },
+      {
+        "category": "Fish",
+        "examples": "Fresh, dried and smoked fish, especially coastal"
+      },
+      {
+        "category": "Onion",
+        "examples": "A base for stews, sauces, vegetable dishes"
+      },
+      {
+        "category": "Garlic",
+        "examples": "Used in meat, vegetable and stew preparations"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain rice",
+        "caveat": ""
+      },
+      {
+        "item": "Plain boiled potatoes",
+        "caveat": "check seasoning"
+      },
+      {
+        "item": "Plain maize-based staple",
+        "caveat": ""
+      },
+      {
+        "item": "Plain grilled meat",
+        "caveat": "check marinade and spice blend"
+      },
+      {
+        "item": "Plain vegetables",
+        "caveat": "no sauce or added ingredients"
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      }
+    ],
+    "closingTip": "Food varies a lot by country and community here — start with a plain staple and add individually checked foods rather than choosing a heavily mixed dish."
+  },
+  {
+    "continent": "Southern Africa",
+    "overview": {
+      "para1": "Southern African cuisine reflects Indigenous traditions alongside Dutch, Malay, Indian and other influences. Maize, meat, vegetables, beans, potatoes, rice and fruit are common, with grilling, stewing and slow cooking used extensively.",
+      "para2": "Simple grilled meat, maize-based foods, vegetables and fresh fruit can provide straightforward choices. More complex dishes may contain dairy, wheat, mustard, tomato, onion, garlic, chilli or sulphites depending on the recipe and regional influence."
+    },
+    "triggers": [
+      {
+        "category": "Milk / dairy",
+        "examples": "Milk, cheese, butter, cream, desserts"
+      },
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Bread, pastries, baked and processed foods"
+      },
+      {
+        "category": "Mustard",
+        "examples": "Marinades, sauces, dressings"
+      },
+      {
+        "category": "Tomato",
+        "examples": "Sauces, relishes, stews, marinades"
+      },
+      {
+        "category": "Onion",
+        "examples": "Common in stews, gravies, relishes"
+      },
+      {
+        "category": "Garlic",
+        "examples": "Used in marinades, sauces, meat dishes"
+      },
+      {
+        "category": "Sulphites",
+        "examples": "Some preserved foods, dried fruit, wine"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain grilled meat",
+        "caveat": "no marinade or sauce"
+      },
+      {
+        "item": "Plain maize-based staple",
+        "caveat": ""
+      },
+      {
+        "item": "Plain baked potato",
+        "caveat": "check butter, cheese, sauces"
+      },
+      {
+        "item": "Plain vegetables",
+        "caveat": "no sauce or seasoning"
+      },
+      {
+        "item": "Plain rice",
+        "caveat": ""
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      }
+    ],
+    "closingTip": "Grilled food looks simple, but marinades, basting sauces and condiments often carry several triggers — ask for them separately where you can."
+  },
+  {
+    "continent": "Central Africa",
+    "overview": {
+      "para1": "Central African cuisine encompasses a wide range of traditions across countries including Cameroon, the Democratic Republic of the Congo, the Republic of the Congo and surrounding regions. Cassava, plantain, maize, rice, vegetables, legumes, fish and meat are important staples.",
+      "para2": "Many traditional meals are based on simple starchy staples served alongside vegetable, meat or fish dishes. Peanuts, fish, shellfish, tomato, onion, garlic and chilli are common in sauces and stews, so the accompanying dish often determines which triggers need attention."
+    },
+    "triggers": [
+      {
+        "category": "Peanuts",
+        "examples": "Peanut sauces, stews, groundnut dishes"
+      },
+      {
+        "category": "Fish",
+        "examples": "Fresh, dried and smoked fish"
+      },
+      {
+        "category": "Crustaceans",
+        "examples": "Prawns and shrimp in coastal or river dishes"
+      },
+      {
+        "category": "Tomato",
+        "examples": "Used in sauces, stews, vegetable dishes"
+      },
+      {
+        "category": "Onion",
+        "examples": "A common flavour base"
+      },
+      {
+        "category": "Garlic",
+        "examples": "Used in marinades, sauces, stews"
+      },
+      {
+        "category": "Chilli",
+        "examples": "Fresh and dried chilli in sauces"
+      },
+      {
+        "category": "Legumes / pulses",
+        "examples": "Beans and other pulses in traditional meals"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain boiled cassava",
+        "caveat": "check accompanying sauce"
+      },
+      {
+        "item": "Plain boiled plantain",
+        "caveat": ""
+      },
+      {
+        "item": "Plain rice",
+        "caveat": ""
+      },
+      {
+        "item": "Plain grilled meat",
+        "caveat": "check marinade and seasoning"
+      },
+      {
+        "item": "Plain vegetables",
+        "caveat": "no sauce or seasoning"
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      }
+    ],
+    "closingTip": "Dishes are often a simple staple plus a richly flavoured sauce — ask for the staple separately and check the sauce if you need to minimise triggers."
+  },
+  {
+    "continent": "Western Fast Food",
+    "overview": {
+      "para1": "Western fast food covers the everyday staples of burger bars, fish and chip shops, diners and pancake houses. Fried and battered foods, bread, dairy and rich sauces are central, with speed and convenience often meaning less visibility into exactly how something is prepared.",
+      "para2": "A few naturally simple options exist, such as plain grilled meat or a jacket potato, but shared fryers and standard recipes mean many dishes carry several common allergens at once, often in the batter, bun or sauce rather than the headline ingredient."
+    },
+    "triggers": [
+      {
+        "category": "Cereals containing gluten",
+        "examples": "Burger buns, batter, breadcrumbs, pancakes"
+      },
+      {
+        "category": "Milk / dairy",
+        "examples": "Cheese, milkshakes, butter, cream, mayonnaise"
+      },
+      {
+        "category": "Egg",
+        "examples": "Batter, pancakes, mayonnaise, some sauces"
+      },
+      {
+        "category": "Fish",
+        "examples": "Fried fish, fish in shared fryer oil"
+      },
+      {
+        "category": "Crustaceans",
+        "examples": "Prawns in shared fryers or seafood sides"
+      },
+      {
+        "category": "Mustard",
+        "examples": "Burger sauces, mayonnaise, condiments"
+      },
+      {
+        "category": "Sesame",
+        "examples": "Sesame-topped buns"
+      },
+      {
+        "category": "Sulphites",
+        "examples": "Some soft drinks, processed sauces, syrups"
+      }
+    ],
+    "safeDefaults": [
+      {
+        "item": "Plain grilled meat",
+        "caveat": "no bun, sauce or breading"
+      },
+      {
+        "item": "Jacket potato",
+        "caveat": "check toppings separately"
+      },
+      {
+        "item": "Plain salad",
+        "caveat": "dressing on the side"
+      },
+      {
+        "item": "Fresh fruit",
+        "caveat": ""
+      },
+      {
+        "item": "Black coffee or plain water",
+        "caveat": ""
+      },
+      {
+        "item": "Plain rice or potatoes",
+        "caveat": "check seasoning"
+      }
+    ],
+    "closingTip": "Ask what the batter, bun and shared fryer oil contain — in fast food, the frying process often carries more triggers than the ingredient list suggests."
+  }
+]

@@ -2756,6 +2756,31 @@ registerCuisineCards({
       {item:"Fresh fruit", caveat:""}
     ],
     closingTip:"Dishes are often a simple staple plus a richly flavoured sauce — ask for the staple separately and check the sauce if you need to minimise triggers."
+  },
+  "Western Fast Food": {
+    overview:{
+      para1:"Western fast food covers the everyday staples of burger bars, fish and chip shops, diners and pancake houses. Fried and battered foods, bread, dairy and rich sauces are central, with speed and convenience often meaning less visibility into exactly how something is prepared.",
+      para2:"A few naturally simple options exist, such as plain grilled meat or a jacket potato, but shared fryers and standard recipes mean many dishes carry several common allergens at once, often in the batter, bun or sauce rather than the headline ingredient."
+    },
+    triggers:[
+      {category:"Cereals containing gluten", examples:"Burger buns, batter, breadcrumbs, pancakes"},
+      {category:"Milk / dairy", examples:"Cheese, milkshakes, butter, cream, mayonnaise"},
+      {category:"Egg", examples:"Batter, pancakes, mayonnaise, some sauces"},
+      {category:"Fish", examples:"Fried fish, fish in shared fryer oil"},
+      {category:"Crustaceans", examples:"Prawns in shared fryers or seafood sides"},
+      {category:"Mustard", examples:"Burger sauces, mayonnaise, condiments"},
+      {category:"Sesame", examples:"Sesame-topped buns"},
+      {category:"Sulphites", examples:"Some soft drinks, processed sauces, syrups"}
+    ],
+    safeDefaults:[
+      {item:"Plain grilled meat", caveat:"no bun, sauce or breading"},
+      {item:"Jacket potato", caveat:"check toppings separately"},
+      {item:"Plain salad", caveat:"dressing on the side"},
+      {item:"Fresh fruit", caveat:""},
+      {item:"Black coffee or plain water", caveat:""},
+      {item:"Plain rice or potatoes", caveat:"check seasoning"}
+    ],
+    closingTip:"Ask what the batter, bun and shared fryer oil contain — in fast food, the frying process often carries more triggers than the ingredient list suggests."
   }
 });
 
